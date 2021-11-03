@@ -12,10 +12,8 @@ void modulo(int64_t in, int64_t num, string word, string& output) {
 }
 
 void fizzbuzz() {
-  int64_t max = 10000000;
-
-  for (int64_t i = 1; i <= max; i++){
-    char num[10];
+  for (int64_t i = 1; i <= 10000000; i++){
+    char num[19];
     string output;
     
     modulo(i, 3, "Fizz", output);
