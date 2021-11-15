@@ -2,6 +2,7 @@
 #include <string>
 #include <time.h>
 
+
 using namespace std;
 
 
@@ -18,8 +19,6 @@ void fizzbuzz() {
     
     modulo(i, 3, "Fizz", output);
     modulo(i, 5, "Buzz", output);
-    modulo(i, 6, "Buzz", output);
-    modulo(i, 8, "Buzz", output);
 
     if (output == "") {
         sprintf(num, "%d", i);
@@ -31,7 +30,6 @@ void fizzbuzz() {
 }
 
 int main() {
-  const int n = 100000000;
 	clock_t t0 = clock();
 	fizzbuzz();
 	clock_t t1 = clock();
