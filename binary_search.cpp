@@ -1,44 +1,7 @@
-#include <iostream>
-#include <ctime>
-
-using namespace std;
-
-
-int guesser (int i, int num, int count) {
-  if (i < num) {
-    //1000 iterations to 1000 isn't efesent but it works
-    i = i*2+2;
-    //dosnt work
-    //i = i+i/2;
-
-    count++;
-    guesser(i, num, count);
-  } else if (i > num) {
-    
-    //i = i >> 1;
-    i = i/2;
-
-    count++;
-    guesser(i, num, count);
-  } else {
-
-    cout << i << " = " << num << " it took " << count << " iterations" << '\n';
-    return i;
-  }
-}
-
-int main(int argc, char const *argv[])
-{
-  int32_t num = 0;
-
-  //generates a number between 1 and 1000:
-  //srand (time(NULL));
-  //num = rand() % 1000 + 1;
-
-  for (int i = 1; i <= 1000; i++)
-    guesser(500, i, 0);
-
-  /* code */
-  return 0;
-}
-
+// Given a sorted array of n-elements (ex. arr = [1, 3, 5, 7, 9, 11]) and a 
+// key to search for (k=6)
+// find the location of the key in the array and return its index.
+// 
+// Input: a sorted n-element array, a key to search for
+// Output: -1 if key not found or an index [0,n) if found
+// Requirement: must be binary search (therefore is done in log2(n))
