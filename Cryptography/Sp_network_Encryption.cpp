@@ -57,27 +57,26 @@ int S_Box_2(int input) {
 }
 
 int P_box_1(int input){
-  /*   0111 0010
-     0 abcd efgh
-     1 fgha bcde
-     2 hafg debc
-     3 hade fgbc
-     4 hdae fbgc 
-     5 hdae fbcg
-       0100 0111
+  /*
+    0 abcd efgh
+    1 efgh abcd
+    2 ghef cdab
+    3 ghcd efab
+    4 gchd eafb
+    5 gchd eabf
   */
+  // input = (input >> 4) | (input << 4);
+  input = (input & 0x00) | ((input & 0xF0)>>4) | ((input & 0xF)<<4); //1
+  input = (input & 0x00) | ((input & 0xcc)>>2) | ((input & 0x33)<<2);//2
+  input = (input & 0xc3) | ((input & 0x30)>>2) | ((input & 0xc)<<2);//3
+  input = (input & 0x99) | ((input & 0x44)>>1) | ((input & 0x22)<<1);//4
+  input = (input & 0xFC) | ((input & 0x2)>>1) | ((input & 0x1)<<1);//5
 
-input = input >> 3 | input << 5;
-input = ((input & 0xcc)>>2) | ((input & 0x33)<<2);
-input = (input & 0xc3) | ((input & 0x30)>>2) | ((input & 0xc)<<2);
-input = (input & 0x99) | ((input & 0x44)>>1) | ((input & 0x22)<<1);
-input = (input & 0xFC) | ((input & 0x2)>>1) | ((input & 0x1)<<1);
-
-return input;  
+  return input;  
 }
 
-int round(int data){
-  for (int i = 0; i <= 5; i++){
+int Round(int data){
+  for (int i = 0; i <= 1; i++){
     int a, b, c;
     a = data & 0xf;
     b = data >> 4;
@@ -87,23 +86,23 @@ int round(int data){
   return data;
 }
 
-int encryption(int data,int key){
+int Encryption(int data,int key){
   int keya , keyb ;
   keya = key & 0xff;
   keyb = key >> 8;
-  data = round(data);
+  data = Round(data);
   data = data ^ keya;
-  data = round(data);
+  data = Round(data);
   data = data ^ keyb;
-  data = round(data);
+  data = Round(data);
 
 
   return data;
 }
 
 int main(int argc, char const *argv[]) {
-  int test = 300;
-  test = encryption(test,0xED6E);
+  int test = 1;
+  test = Encryption(test,0xED6E);
   cout << test << endl;
 
   return 0;
