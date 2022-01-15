@@ -89,8 +89,8 @@ uint32_t Round(uint32_t data){
 
 uint32_t Dencryption(uint32_t data,uint32_t key){
   uint32_t keya , keyb ;
-  keya = 0x6E;
-  keyb = 0xED;
+  keya = key & 0xFF;
+  keyb = (key >> 8) & 0xFF;
   data = Round(data);
   data = data ^ keyb;
   data = Round(data);
@@ -108,6 +108,10 @@ int main(int argc, char const *argv[]) {
 
   test = 241;
   test = Dencryption(test,0xED6E);
+  cout << test << endl;
+
+  test = 12;
+  test = Dencryption(test,0x6FED);
   cout << test << endl;
 
   test = 239;
