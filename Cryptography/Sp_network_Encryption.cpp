@@ -65,7 +65,7 @@ uint32_t P_box_1(uint32_t input){
     4 gchd eafb
     5 gchd eabf
   */
-  // input = (input >> 4) | (input << 4);
+
   input = (input & 0x00) | ((input & 0xF0)>>4) | ((input & 0xF)<<4); //1
   input = (input & 0x00) | ((input & 0xcc)>>2) | ((input & 0x33)<<2);//2
   input = (input & 0xc3) | ((input & 0x30)>>2) | ((input & 0xc)<<2);//3
@@ -95,8 +95,6 @@ uint32_t Encryption(uint32_t data,uint32_t key){
   data = Round(data);
   data = data ^ keyb;
   data = Round(data);
-
-
   return data;
 }
 

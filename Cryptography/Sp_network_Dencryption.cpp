@@ -64,8 +64,8 @@ uint32_t P_box_1(uint32_t input){
     2 ghef cdab
     1 efgh abcd
     0 abcd efgh
-    
   */
+
   input = (input & 0xFC) | ((input & 0x2)>>1) | ((input & 0x1)<<1); //5
   input = (input & 0x99) | ((input & 0x44)>>1) | ((input & 0x22)<<1); //4
   input = (input & 0xc3) | ((input & 0x30)>>2) | ((input & 0xc)<<2);//3
@@ -81,8 +81,7 @@ uint32_t Round(uint32_t data){
     data = P_box_1(data);
     a = data & 0xf;
     b = data >> 4;
-    data = S_Box_1(a) | (S_Box_2(b) << 4); // 1110 1101
-    
+    data = S_Box_1(a) | (S_Box_2(b) << 4);
   }
   return data;
 }
@@ -96,8 +95,6 @@ uint32_t Dencryption(uint32_t data,uint32_t key){
   data = Round(data);
   data = data ^ keya;
   data = Round(data);
-
-
   return data;
 }
 
