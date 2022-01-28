@@ -1,15 +1,15 @@
-
 #include<iostream>
+#include<vector>
 
 using namespace std;
 
 //choose(n,r) = n!/(r! (n-r)!) = 52! / (6! 46!)
 
 double fact(int32_t n) {
-	static double memo[100]{1,1,2,6,24,120,720,5040,40320,362880,3628800};
-	if (memo[n] != 0)
+	static vector<double> memo{1,1,2,6,24,120,720,5040,40320,362880,3628800};
+	if (n < memo.size())
 		return memo[n];
-	for (uint32_t i = 9; i <= n; i++)
+	for (uint32_t i = memo.size(); i <= n; i++)
 	{
 		memo[i] = memo[i-1] * i;
 	}
@@ -26,8 +26,9 @@ double choose(int n, int r){
 	return memo[n][r];
 }
 
-int main()
-{
+int main(){
+	cout << fact(170) << '\n';
+	cout << fact(171) << '\n';
 	cout << choose(52, 6) << '\n';
 	
 	return 0;
