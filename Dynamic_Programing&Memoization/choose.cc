@@ -10,41 +10,41 @@ using namespace std;
 
 vector<double> factmemo{1};
 
-
+//reads the fact table from if it exists
 void Reader(string file){
 	struct stat buffer;
 	if(stat("file", &buffer) != 0)
 		return;
-  // Create a text string, which is used to output the text file
-  double myText;
+	// Create a text string, which is used to output the text file
+	double myText;
 
-  // Read from the text file
-  ifstream MyReadFile("file");
-  factmemo.pop_back();
-  while (MyReadFile >> myText) {
-    if (factmemo.size() == factmemo.capacity())
-  		factmemo.reserve(factmemo.size()*1.50);
-  	factmemo.push_back(myText);
-  }
-  // Close the file
-  MyReadFile.close(); 
+	// Read from the text file
+	ifstream MyReadFile("file");
+	factmemo.pop_back();
+	while (MyReadFile >> myText) {
+		if (factmemo.size() == factmemo.capacity())
+			factmemo.reserve(factmemo.size()*1.50);
+		factmemo.push_back(myText);
+	}
+	// Close the file
+	MyReadFile.close(); 
 }
 
+//writes factmemo array to fact table
 void Writer(string file){
-  // Create and open a text file
-  ofstream Factfile(file);
-  
-  // Write to the file
-  for (size_t i = 0; i < factmemo.size(); i++){
-    if (factmemo[i] == 0)
-      break;
-    Factfile << factmemo[i] << endl;
-  }
+	ofstream Factfile(file);
+	
+	// Write to the file
+	for (size_t i = 0; i < factmemo.size(); i++){
+		if (factmemo[i] == 0)
+			break;
+		Factfile << factmemo[i] << endl;
+	}
 
-  // Close the file
-  Factfile.close();
+	Factfile.close();
 }
 
+//factoreal calculation function
 double fact(int32_t n) {
 	if (n < factmemo.size())
 		return factmemo[n];
@@ -56,6 +56,7 @@ double fact(int32_t n) {
 	return factmemo[n];
 }
 
+//choose calculation function
 double choose(int n, int r) {
 	static double memo[100][100] = {0};
 
