@@ -1,22 +1,25 @@
 //Alice Houston
 #include<iostream>
 #include<vector>
-#include <fstream>
-#include <sys/stat.h>
+#include<fstream>
+#include<sys/stat.h>
+#include<string>
 
 using namespace std;
 //choose(n,r) = n!/(r! (n-r)!) = 52! / (6! 46!)
 
 vector<double> factmemo{1};
-void Reader(){
+
+
+void Reader(string file){
 	struct stat buffer;
-	if(stat("./facttable.txt", &buffer) != 0)
+	if(stat("file", &buffer) != 0)
 		return;
   // Create a text string, which is used to output the text file
   double myText;
 
   // Read from the text file
-  ifstream MyReadFile("./facttable.txt");
+  ifstream MyReadFile("file");
   factmemo.pop_back();
   while (MyReadFile >> myText) {
     if (factmemo.size() == factmemo.capacity())
@@ -27,9 +30,9 @@ void Reader(){
   MyReadFile.close(); 
 }
 
-void Writer(){
+void Writer(string file){
   // Create and open a text file
-  ofstream Factfile("./facttable.txt");
+  ofstream Factfile(file);
   
   // Write to the file
   for (size_t i = 0; i < factmemo.size(); i++){
@@ -64,13 +67,12 @@ double choose(int n, int r) {
 }
 
 int main(){
-
-	Reader();
-	cout << fact(20) << '\n';
-	cout << fact(170) << '\n';
-	cout << fact(171) << '\n';
-	cout << choose(52, 6) << '\n';
-	Writer();
+	string factfile = "facttable.txt";
+	Reader(factfile);
+	cout << fact(20) << endl;
+	cout << fact(170) << endl;
+	cout << choose(52, 6) << endl;
+	Writer(factfile);
 
 	return 0;
 }
