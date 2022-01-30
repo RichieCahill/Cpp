@@ -20,18 +20,16 @@ void Reader(string file){
 	struct stat buffer;
 	if(stat("file", &buffer) != 0)
 		return;
-	// Create a text string, which is used to output the text file
-	double myText;
+	double input;
 
 	// Read from the text file
 	ifstream MyReadFile("file");
 	factmemo.pop_back();
-	while (MyReadFile >> myText) {
+	while (MyReadFile >> input) {
 		if (factmemo.size() == factmemo.capacity())
 			factmemo.reserve(factmemo.size()*1.50);
-		factmemo.push_back(myText);
+		factmemo.push_back(input);
 	}
-	// Close the file
 	MyReadFile.close(); 
 }
 
@@ -45,7 +43,6 @@ void Writer(string file){
 			break;
 		Factfile << factmemo[i] << endl;
 	}
-
 	Factfile.close();
 }
 
