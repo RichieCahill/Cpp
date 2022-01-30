@@ -13,17 +13,18 @@
 using namespace std;
 //choose(n,r) = n!/(r! (n-r)!) = 52! / (6! 46!)
 
+const string factfile = "facttable.txt";
 vector<double> factmemo{1};
 
 //reads the fact table from if it exists
-void Reader(string file){
+void Reader(){
 	struct stat buffer;
-	if(stat("file", &buffer) != 0)
+	if(stat("factfile", &buffer) != 0)
 		return;
 	double input;
 
 	// Read from the text file
-	ifstream MyReadFile("file");
+	ifstream MyReadFile("factfile");
 	factmemo.pop_back();
 	while (MyReadFile >> input) {
 		if (factmemo.size() == factmemo.capacity())
@@ -34,8 +35,8 @@ void Reader(string file){
 }
 
 //writes factmemo array to fact table
-void Writer(string file){
-	ofstream Factfile(file);
+void Writer(){
+	ofstream Factfile(factfile);
 	
 	// Write to the file
 	for (size_t i = 0; i < factmemo.size(); i++){
@@ -70,12 +71,11 @@ double choose(int n, int r) {
 }
 
 int main(){
-	string factfile = "facttable.txt";
-	Reader(factfile);
+	Reader();
 	cout << fact(20) << endl;
 	cout << fact(170) << endl;
 	cout << choose(52, 6) << endl;
-	Writer(factfile);
+	Writer();
 
 	return 0;
 }
