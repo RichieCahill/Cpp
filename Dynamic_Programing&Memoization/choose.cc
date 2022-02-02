@@ -47,7 +47,10 @@ void Writer(){
 	Factfile.close();
 }
 
-//factoreal calculation function
+/*
+factoreal calculation function
+this function is O(n) if the data is not in the array but it is Ω(1) if its present
+*/
 double fact(int32_t n) {
 	if (n < factmemo.size())
 		return factmemo[n];
@@ -59,7 +62,11 @@ double fact(int32_t n) {
 	return factmemo[n];
 }
 
-//choose calculation function
+/*
+choose calculation
+this function is O(n) because the factor is memoization 
+but can be Ω(1) if the factor was previously calculated
+*/
 double choose(int n, int r) {
 	static double memo[100][100] = {0};
 
