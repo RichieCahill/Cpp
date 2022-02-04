@@ -19,12 +19,12 @@ vector<double> factmemo{1};
 //reads the fact table from if it exists
 void Reader(){
 	struct stat buffer;
-	if(stat("factfile", &buffer) != 0)
+	if(stat(facttable.txt, &buffer) != 0)
 		return;
 	double input;
 
 	// Read from the text file
-	ifstream MyReadFile("factfile");
+	ifstream MyReadFile(factfile);
 	factmemo.pop_back();
 	while (MyReadFile >> input) {
 		if (factmemo.size() == factmemo.capacity())
@@ -81,6 +81,7 @@ int main(){
 	Reader();
 	cout << fact(20) << endl;
 	cout << fact(170) << endl;
+	cout << fact(171) << endl;
 	cout << choose(52, 6) << endl;
 	Writer();
 
