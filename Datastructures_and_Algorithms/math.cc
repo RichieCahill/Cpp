@@ -11,19 +11,18 @@
 using namespace std;
 
 
-
+//Complexity O(log n)
 mpz_class gcd(mpz_class m, mpz_class n){
 	if (n==0)
 		return m;
 	return gcd(n, m%n);
 }
-
-mpz_class lcmout("0");
+//Complexity O(log n)
 mpz_class lcm(mpz_class m, mpz_class n){
 	return m * n / gcd(m,n);
 } 
 
-
+//Complexity O(log n)
 mpz_class power(mpz_class a,mpz_class n){
 	mpz_class prod = 1;
 	while (n>0){
@@ -36,7 +35,12 @@ mpz_class power(mpz_class a,mpz_class n){
 }
 
 
-
+/*
+choose calculation
+Complexity O(n)
+but can be Ω(1) if the factor was previously calculated
+This is memory expensive
+*/
 mpz_class memofact(uint64_t n){
 	static vector<mpz_class> factmemo{1,1,2,6,24,120,720,5040,40320,362880,3628800,39916800,479001600,6227020800,87178291200,1307674368000,20922789888000,355687428096000,6402373705728000,121645100408832000,2432902008176640000};
 	mpz_class temp = 1;
@@ -50,10 +54,11 @@ mpz_class memofact(uint64_t n){
 	return factmemo[n];
 }
 
+//Complexity O(n)
 mpz_class fastfact(mpz_class n){
 	mpz_class temp = 1;
 	for (mpz_class i = 1; i <= n; i++) {
-	temp=temp*i;
+		temp=temp*i;
 	}
 	return temp;
 }
