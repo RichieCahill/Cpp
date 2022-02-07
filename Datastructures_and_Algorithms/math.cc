@@ -1,4 +1,8 @@
-//https://gmplib.org/manual/C_002b_002b-Interface-Integers
+/*resources
+https://gmplib.org/manual/C_002b_002b-Interface-Integers
+https://www.cplusplus.com/reference/cstdlib/rand/
+*/
+
 #include <iostream>
 #include <stdio.h>
 #include <gmp.h>
@@ -7,6 +11,8 @@
 #include <fstream>
 #include <sys/stat.h>
 #include <string>
+#include <stdlib.h>
+#include <time.h>
 
 using namespace std;
 
@@ -34,6 +40,17 @@ mpz_class power(mpz_class a,mpz_class n){
 	return prod;
 }
 
+//Complexity O(log n)
+mpz_class powermod(mpz_class a,mpz_class n,mpz_class m){
+	mpz_class prod = 1;
+	while (n>0){
+		if (n%2==1)
+			prod=prod*a%m;
+		a=a*a%m;
+		n=n/2;
+	}
+	return prod;
+}
 
 /*
 choose calculation
@@ -63,6 +80,20 @@ mpz_class fastfact(mpz_class n){
 	return temp;
 }
 
+//Complexity O(k log n)
+mpz_class FermatIsPrime(mpz_class n,mpz_class k) {
+	for (size_t i = 0; i < k; i++) {
+	  mpz_class a;
+	  srand (time(NULL));
+	  a = rand() % n-1 + 2;
+		if (powermod(a,n-1,n) != 1)
+			return false;
+	}
+return true;
+}
+
+
+
 
 int main(int argc, char const *argv[]){
 
@@ -72,6 +103,8 @@ int main(int argc, char const *argv[]){
 	cout << lcm(18, 12) << endl;
 	cout << "power" << endl;
 	cout << power(10,10) << endl;
+	cout << powermod(10,11,3) << endl;
+	cout << FermatIsPrime(3,3) << endl;
 	cout << "Fact" << endl;
 	cout << fastfact(5) << endl;
 	cout << memofact(5) << endl;
