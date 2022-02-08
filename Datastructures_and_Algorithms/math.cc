@@ -1,6 +1,8 @@
 /*resources
 https://gmplib.org/manual/C_002b_002b-Interface-Integers
 https://www.cplusplus.com/reference/cstdlib/rand/
+https://www.cplusplus.com/reference/random/
+https://en.cppreference.com/w/cpp/header/random
 */
 
 #include <iostream>

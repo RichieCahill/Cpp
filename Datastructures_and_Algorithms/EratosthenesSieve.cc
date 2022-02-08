@@ -22,7 +22,7 @@ void EratosthenesSieve(uint64_t n){
 	}
 
 	for (uint64_t i = 3; i <= sqrt(n); i+=2){
-		if (isPrime[i] == true){
+		if (isPrime[i]){
 			count++;
 			for (uint64_t j = i*i; j <= n; j+=2*i){
 				isPrime[j] == false;
