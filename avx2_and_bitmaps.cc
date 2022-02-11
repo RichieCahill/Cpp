@@ -38,6 +38,44 @@ cout << hex << _mm256_extract_epi64(a, 1) << endl;
 cout << hex << _mm256_extract_epi64(a, 0) << endl;
 cout << endl;
 }
+
+void testtest(uint64_t n){
+uint64_t test, testa = 1, testb = 2, testc = 3;
+
+test = (n+255)/256;
+cout << test << endl;
+__m256i list[test] = {};
+
+for (uint64_t i = 0; i < test; i++)
+	list[i] = _mm256_set_epi64x(0XFFFFFFFFFFFFFFFF, 0XFFFFFFFFFFFFFFFF, 0XFFFFFFFFFFFFFFFF, 0XFFFFFFFFFFFFFFFF);
+
+for (uint64_t i = 0; i < test; i++){
+
+	if (i==0)
+		list[i] = _mm256_set_epi64x(0xF6DB6DB6DB6DB6DB, 0x6DB6DB6DB6DB6DB6, 0xDB6DB6DB6DB6DB6D, 0xB6DB6DB6DB6DB6DB);
+	
+	if (i==testa){
+		list[i] = _mm256_set_epi64x(0x6DB6DB6DB6DB6DB6, 0xDB6DB6DB6DB6DB6D, 0xB6DB6DB6DB6DB6DB, 0x6DB6DB6DB6DB6DB6);
+		testa+=3;
+	}
+  
+	if (i==testb){
+		list[i] = _mm256_set_epi64x(0xDB6DB6DB6DB6DB6D, 0xB6DB6DB6DB6DB6DB, 0x6DB6DB6DB6DB6DB6, 0xDB6DB6DB6DB6DB6D);
+		testb+=3;
+	}
+  
+	if (i==testc){
+		list[i] = _mm256_set_epi64x(0xB6DB6DB6DB6DB6DB, 0x6DB6DB6DB6DB6DB6, 0xDB6DB6DB6DB6DB6D, 0xB6DB6DB6DB6DB6DB);
+		testc+=3;
+	}
+	
+}
+
+for (uint64_t i = 0; i < test; i++)
+	out(list[i]);
+
+}
+
 /*
 
 setp 1
@@ -133,8 +171,17 @@ can probably made into 6 INTs in with rol
 
 */
 
-int main(){    
+int main(){
+
+testtest(10000000);
+
+	return 0;
+}
+
+/*
 __m256i a, b, c, d, e, f;
+
+Original
 
 //1
 a = fill(a);
@@ -246,7 +293,7 @@ f = _mm256_set_epi64x(0xFEFFDFFBFF7FEFFD, 0xFFBFF7FEFFDFFBFF, 0x7FEFFDFFBFF7FEFF
 a = avxand(a, b, c, d, e, f);
 
 out(a);
-
+*/
 
 /*
 cout << test << endl;
@@ -257,8 +304,7 @@ cout << test << endl;
 test = test & 0xFF7BDEF7BDEF7BDE;
 cout << test << endl;
 */
-	return 0;
-}
+
 
 /*
 3 5 7 9 11 13 1 
@@ -288,7 +334,7 @@ cout << test << endl;
 3 101011010100 924  
 5 010000100001 421
 7 001011111010 204
-     *
+
 23456789 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29
 11010100  0  1   0  1  0  0  0  1  0  1  0  0  0  1  0  0  0  0  0  1010000010001010001010001000001010000
 
