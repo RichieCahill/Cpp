@@ -31,11 +31,11 @@ mpz_class lcm(mpz_class m, mpz_class n){
 //Complexity O(log n)
 mpz_class power(mpz_class a,mpz_class n){
 	mpz_class prod = 1;
-	while (n>0){
+	while (n){
 		if (n%2==1)
-			prod=prod*a;
-		a=a*a;
-		n=n/2;
+			prod*=a;
+		a*=a;
+		n>>=1;
 	}
 	return prod;
 }
@@ -43,11 +43,11 @@ mpz_class power(mpz_class a,mpz_class n){
 //Complexity O(log n)
 mpz_class powermod(mpz_class a,mpz_class n,mpz_class m){
 	mpz_class prod = 1;
-	while (n>0){
+	while (n){
 		if (n%2==1)
-			prod=prod*a%m;
-		a=a*a%m;
-		n=n/2;
+			prod*=a%m;
+		a*=a%m;
+		n>>=1;
 	}
 	return prod;
 }
