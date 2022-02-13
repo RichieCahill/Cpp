@@ -1,19 +1,17 @@
-/*resources
+/*
+resources
 https://gmplib.org/manual/C_002b_002b-Interface-Integers
 https://www.cplusplus.com/reference/cstdlib/rand/
 https://www.cplusplus.com/reference/random/
 https://en.cppreference.com/w/cpp/header/random
+
+compile comand
+g++ -lgmpxx -lgmp math.cc 
 */
 
 #include <iostream>
-#include <stdio.h>
-#include <gmp.h>
 #include <gmpxx.h>
 #include <vector>
-#include <fstream>
-#include <sys/stat.h>
-#include <string>
-#include <stdlib.h>
 #include <time.h>
 
 using namespace std;
