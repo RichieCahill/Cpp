@@ -12,7 +12,7 @@ plans
 	give it better output
 	chang the bool array to a bit base based array 
 */
-void EratosthenesSieve(uint64_t n){
+void EratosthenesSieve(uint64_t n ){
 	uint64_t count = 1; // special case to account for the only even prime, 2
 	bool isPrime[n] = {false};
 	

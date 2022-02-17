@@ -172,8 +172,47 @@ can probably made into 6 INTs in with rol
 */
 
 int main(){
+	__m256i a;
 
-testtest(10000000);
+	a = two(a);
+
+	a = _mm256_slli_si256(a, 2);
+
+	out(a);
+
+	uint64_t test;
+
+	__m128i b, c;
+
+	b = _mm_set_epi64x(0x9249249249249249, 0x9249249249249249);
+	
+	
+
+	test =_bextr_u64( _mm_extract_epi64 (b, 0), 64, 4);
+
+
+	cout <<  test << endl;
+
+	// _bextr2_u64
+	c = _mm_set_epi64x(1, 2);
+
+	// b = _mm_slli_si128(b, 7);
+	// 49924924924924924900000000000000
+	// shits buy byt not bits
+	// b = _mm_srav_epi32(b, c);
+	// 92492492249249249249249212492492
+	// no ide but not what i want
+	// b = _mm_sllv_epi64(b, c);
+	// 24924924924924924924924924924924
+	// dos wha ti want but you need to comput section indevigualy
+	// b = b << 4;
+	// 24924924924924902492492492492490
+	// it treat it as 2 6b bit ints
+	
+	cout << hex << _mm_extract_epi64 (b, 1) << endl;
+	cout << hex << _mm_extract_epi64 (b, 0) << endl;	
+	
+	// testtest(10000000);
 
 	return 0;
 }
