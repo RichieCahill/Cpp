@@ -176,7 +176,7 @@ int main(){
 
 	a = two(a);
 
-	a = _mm256_slli_si256(a, 2);
+	a = a << 2;
 
 	out(a);
 
@@ -211,7 +211,7 @@ int main(){
 	
 	cout << hex << _mm_extract_epi64 (b, 1) << endl;
 	cout << hex << _mm_extract_epi64 (b, 0) << endl;	
-	
+
 	// testtest(10000000);
 
 	return 0;
