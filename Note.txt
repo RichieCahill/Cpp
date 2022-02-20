@@ -1,1 +1,7 @@
 https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#avx512techs=AVX512F,AVX512BW,AVX512CD,AVX512DQ,AVX512IFMA52,AVX512VL,AVX512VPOPCNTDQ,AVX512_BITALG,AVX512_VBMI,AVX512_VBMI2,AVX512_VNNI
+
+_mm256_sllv_epi64
+_mm_permute
+
+_lrotl
+_lrotr

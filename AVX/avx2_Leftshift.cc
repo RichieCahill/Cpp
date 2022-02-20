@@ -14,7 +14,7 @@ __asm__ (
 return c;
 }
 
-
+/*
 __m256i avx256_sub (__m256i n, __m256i s){
 __asm__ (
 	"addl %%ebx, %%eax;" 
@@ -23,29 +23,35 @@ __asm__ (
 	: "=a" (n) : "a" (n) , "b" (s));
 return n;
 }
-/*
+
 #	./avx2_testing.cc:90: 	a = _mm256_sub_epi64(a,a);
 	.loc 2 90 22
 	cd	%ymm0, 128(%rsp)	# D.71430, a
 */
 
-/*
-__m256i avx256_rol (__m256i n, uint64_t s){
-__asm__ (
-	"addl %%ebx, %%eax;" 
-	"addl %%eax, %%ebx;"
-	"imull %%ebx, %%eax;" 
-	: "=a" (n) : "a" (n) , "b" (s));
-return n;
-}
-*/
 
+__m256i avx256_ls (__m256i n, int64_t s){
+	__m256i temp;
+	
+	//This i can get this down to one 64 bit register and proby faster
+	uint64_t rail2 = _mm256_extract_epi64(n, 2), rail1 = _mm256_extract_epi64(n, 1), rail0 = _mm256_extract_epi64(n, 0);
+	
+	rail2 = rail2 >> (64-s);
+	rail1 = rail1 >> (64-s);
+	rail0 = rail0 >> (64-s);
+
+
+	temp = _mm256_set_epi64x(rail2, rail1, rail0, 0X0000000000000000);
+	
+	n = n << s;
+
+	n = _mm256_or_si256(n, temp);
+	return n;
+}
 
 
 int main(int argc, char const *argv[]){
 __m256i a;
-
-a = _mm256_set_epi64x(0XFFFFFFFFFFFFFFFF, 0XFFFFFFFFFFFFFFFF, 0XFFFFFFFFFFFFFFFF, 0XFFFFFFFFFFFFFFFF);
 
 /*
 # /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include/avxintrin.h:1306:   return __extension__ (__m256i)(__v4di){ __D, __C, __B, __A };
@@ -90,15 +96,15 @@ a = _mm256_set_epi64x(0XFFFFFFFFFFFFFFFF, 0XFFFFFFFFFFFFFFFF, 0XFFFFFFFFFFFFFFFF
 	movq	%rax, %rdi	# _16,
 	call	_ZNSolsEPFRSoS_E@PLT	#
 */
+  
+	a = _mm256_set_epi64x(0X1020408102040810, 0X2040810204081020, 0X4081020408102040, 0X8102040810204081);
 
-	a = _mm256_sub_epi64(a,a);
+	a = avx256_ls(a,2);
 
 	cout << hex << _mm256_extract_epi64(a, 3) << endl;
 	cout << hex << _mm256_extract_epi64(a, 2) << endl;
 	cout << hex << _mm256_extract_epi64(a, 1) << endl;
 	cout << hex << _mm256_extract_epi64(a, 0) << endl;
 	cout << endl;
-
-	cout << asmadd(1, 1) << endl;
 	return 0;
 }
