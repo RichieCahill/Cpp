@@ -39,6 +39,8 @@ return n;
 
 
 __m256i avx256_ls (__m256i n, int64_t s){
+	if (s==0)
+		return n;
 	__m256i temp;
 	
 	//creats a temp __m256i taht maske the firs n bit in lane 3 2 1
@@ -60,6 +62,8 @@ __m256i avx256_ls (__m256i n, int64_t s){
 // _mm256_slli_si256 has to be assigned at compile time so this is less helpfull then i thought
 // it may be worth it becau i beleave the register will need to dissisebled less
 __m256i avx256_ls_improved (__m256i n, int s){
+	if (s==0)
+		return n;
 	__m256i temp;
 	if (s==8){	
 		//i think this cn be  faster
@@ -107,6 +111,8 @@ _mm_load may be how to build avx registers
 */
 
 __m256i avx256_ls_test (__m256i n, int64_t s){
+	if (s==0)
+		return n;
 	__m256i temp;
 	__m128i t128_0, t128_1;
 	uint64_t t64_0, t64_1;
