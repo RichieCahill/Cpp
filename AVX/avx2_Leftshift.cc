@@ -40,6 +40,8 @@ return n;
 
 __m256i avx256_ls (__m256i n, int64_t s){
 	__m256i temp;
+	
+	//creats a temp __m256i taht maske the firs n bit in lane 3 2 1
 	//i think can get this down to one 64 bit register and probably faster
 	uint64_t rail2 = _mm256_extract_epi64(n, 2), rail1 = _mm256_extract_epi64(n, 1), rail0 = _mm256_extract_epi64(n, 0);
 	
@@ -49,8 +51,8 @@ __m256i avx256_ls (__m256i n, int64_t s){
 
 	temp = _mm256_set_epi64x(rail2, rail1, rail0, 0X0000000000000000);
 
+	// left shit the 4 64 bit ins in n then or with temp
 	n = n << s;
-
 	n = _mm256_or_si256(n, temp);
 	return n;
 }
@@ -71,7 +73,8 @@ __m256i avx256_ls_improved (__m256i n, int s){
 
 		return n;
 	}
-		
+
+	//creats a temp __m256i taht maske the firs n bit in lane 3 2 1
 	//i think can get this down to one 64 bit register and probably faster
 	uint64_t rail2 = _mm256_extract_epi64(n, 2), rail1 = _mm256_extract_epi64(n, 1), rail0 = _mm256_extract_epi64(n, 0);
 	
@@ -82,8 +85,8 @@ __m256i avx256_ls_improved (__m256i n, int s){
 
 	temp = _mm256_set_epi64x(rail2, rail1, rail0, 0X0000000000000000);
 	
+	// left shit the 4 64 bit ins in n then or with temp
 	n = n << s;
-
 	n = _mm256_or_si256(n, temp);
 	return n;
 }
@@ -98,6 +101,7 @@ _mm256_set_m128i = Skylake								3		1
 total 20 6.83
 +			 ? ?    for _mm_set_epi64x
 
+educated guess is total latncy 25 and cpi of 10
 
 _mm_load may be how to build avx registers
 */
@@ -107,6 +111,7 @@ __m256i avx256_ls_test (__m256i n, int64_t s){
 	__m128i t128_0, t128_1;
 	uint64_t t64_0, t64_1;
 
+	//pulls the avx register apart and left shits stor the out put in a __m128i
 	t128_0 =	_mm256_extracti128_si256(n, 0);
 	t64_0 = _mm_extract_epi64(t128_0, 0);
 	t64_0 = t64_0>> (64-s);
@@ -114,15 +119,17 @@ __m256i avx256_ls_test (__m256i n, int64_t s){
 	t64_1 = t64_1>> (64-s);
 	t128_0 = _mm_set_epi64x(t64_0, 0X0000000000000000);
 	
+	//pulls the avx register apart and left shits stor the out put in a __m128i
 	t128_1 = _mm256_extracti128_si256(n, 1);
 	t64_0 = _mm_extract_epi64(t128_1, 0);
 	t64_0 = t64_0>> (64-s);
 	t128_1	= _mm_set_epi64x(t64_0, t64_1);
 
+	//combins the 2 __m128i into a __m256i
 	temp = _mm256_set_m128i(t128_1, t128_0);
 
+	// left shit the 4 64 bit ins in n then or with temp
 	n = n << s;
-
 	n = _mm256_or_si256(n, temp);
 	return n;
 }
@@ -191,7 +198,7 @@ __m256i a;
 	movq	%rax, %rdi	# _16,
 	call	_ZNSolsEPFRSoS_E@PLT	#
 */
-  
+
 	a = _mm256_set_epi64x(0X1020408102040810, 0X2040810204081020, 0X4081020408102040, 0X8102040810204081);
 
 	a = avx256_ls(a,8);
@@ -215,11 +222,6 @@ __m256i a;
 	a = avx256_roll(a,3);
 	
 	out(a);
-	
-
-	
-
-
 
 	return 0;
 }
