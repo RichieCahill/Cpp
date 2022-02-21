@@ -40,7 +40,7 @@ return n;
 
 __m256i avx256_ls (__m256i n, int64_t s){
 	__m256i temp;
-	//i think can get this down to one 64 bit register and proby faster
+	//i think can get this down to one 64 bit register and probably faster
 	uint64_t rail2 = _mm256_extract_epi64(n, 2), rail1 = _mm256_extract_epi64(n, 1), rail0 = _mm256_extract_epi64(n, 0);
 	
 	rail2 = rail2 >> (64-s);
@@ -55,23 +55,24 @@ __m256i avx256_ls (__m256i n, int64_t s){
 	return n;
 }
 
-__m256i avx256_ls_improved (__m256i n, int64_t s){
+// _mm256_slli_si256 has to be assigned at compile time so this is less helpfull then i thought
+// it may be worth it becau i beleave the register will need to dissisebled less
+__m256i avx256_ls_improved (__m256i n, int s){
 	__m256i temp;
-	if (s%8==0){	
+	if (s==8){	
+		//i think this cn be  faster
 		uint64_t rail1 = _mm256_extract_epi64(n, 1);
-	
+		
 		rail1 = rail1 >> (64-s);
-		//i think can get this down to one 64 bit register and proby faster
+		
 		temp = _mm256_set_epi64x(0X0000000000000000, rail1, 0X0000000000000000, 0X0000000000000000);
 	
-		n = __builtin_ia32_pslldqi256 (n , s);
-
-		n = _mm256_or_si256(n, temp);
+		n = _mm256_or_si256(_mm256_slli_si256(n,1), temp);
 
 		return n;
 	}
 		
-	//i think can get this down to one 64 bit register and proby faster
+	//i think can get this down to one 64 bit register and probably faster
 	uint64_t rail2 = _mm256_extract_epi64(n, 2), rail1 = _mm256_extract_epi64(n, 1), rail0 = _mm256_extract_epi64(n, 0);
 	
 	rail2 = rail2 >> (64-s);
@@ -111,7 +112,7 @@ __m256i avx256_ls_asm (__m256i n, int64_t s){
 __m256i avx256_roll (__m256i n, int64_t s){
 	__m256i temp;
 	
-	//This i can get this down to one 64 bit register and proby faster
+	//This i can get this down to one 64 bit register and probably faster
 	uint64_t rail3 = _mm256_extract_epi64(n, 3), rail2 = _mm256_extract_epi64(n, 2), rail1 = _mm256_extract_epi64(n, 1), rail0 = _mm256_extract_epi64(n, 0);
 
 	rail3 = rail3 >> (64-s);
@@ -175,13 +176,13 @@ __m256i a;
   
 	a = _mm256_set_epi64x(0X1020408102040810, 0X2040810204081020, 0X4081020408102040, 0X8102040810204081);
 
-	a = avx256_ls(a,2);
+	a = avx256_ls(a,8);
 	
 	out(a);
 	
 	a = _mm256_set_epi64x(0X1020408102040810, 0X2040810204081020, 0X4081020408102040, 0X8102040810204081);
 
-	a = avx256_ls_improved(a,2);
+	a = avx256_ls_improved(a,8);
 	
 	out(a);
 
