@@ -40,8 +40,59 @@ return n;
 
 __m256i avx256_ls (__m256i n, int64_t s){
 	__m256i temp;
+	//i think can get this down to one 64 bit register and proby faster
+	uint64_t rail2 = _mm256_extract_epi64(n, 2), rail1 = _mm256_extract_epi64(n, 1), rail0 = _mm256_extract_epi64(n, 0);
 	
-	//This i can get this down to one 64 bit register and proby faster
+	rail2 = rail2 >> (64-s);
+	rail1 = rail1 >> (64-s);
+	rail0 = rail0 >> (64-s);
+
+	temp = _mm256_set_epi64x(rail2, rail1, rail0, 0X0000000000000000);
+	
+	n = n << s;
+
+	n = _mm256_or_si256(n, temp);
+	return n;
+}
+
+__m256i avx256_ls_improved (__m256i n, int64_t s){
+	__m256i temp;
+	if (s%8==0){	
+		uint64_t rail1 = _mm256_extract_epi64(n, 1);
+	
+		rail1 = rail1 >> (64-s);
+		//i think can get this down to one 64 bit register and proby faster
+		temp = _mm256_set_epi64x(0X0000000000000000, rail1, 0X0000000000000000, 0X0000000000000000);
+	
+		n = __builtin_ia32_pslldqi256 (n , s);
+
+		n = _mm256_or_si256(n, temp);
+
+		return n;
+	}
+		
+	//i think can get this down to one 64 bit register and proby faster
+	uint64_t rail2 = _mm256_extract_epi64(n, 2), rail1 = _mm256_extract_epi64(n, 1), rail0 = _mm256_extract_epi64(n, 0);
+	
+	rail2 = rail2 >> (64-s);
+	rail1 = rail1 >> (64-s);
+	rail0 = rail0 >> (64-s);
+
+
+	temp = _mm256_set_epi64x(rail2, rail1, rail0, 0X0000000000000000);
+	
+	n = n << s;
+
+	n = _mm256_or_si256(n, temp);
+	return n;
+}
+
+
+//asm testing
+__m256i avx256_ls_asm (__m256i n, int64_t s){
+	__m256i temp;
+	
+
 	uint64_t rail2 = _mm256_extract_epi64(n, 2), rail1 = _mm256_extract_epi64(n, 1), rail0 = _mm256_extract_epi64(n, 0);
 	
 	rail2 = rail2 >> (64-s);
@@ -76,7 +127,7 @@ __m256i avx256_roll (__m256i n, int64_t s){
 	return n;
 }
 int main(int argc, char const *argv[]){
-__m256i a, b;
+__m256i a;
 
 /*
 # /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include/avxintrin.h:1306:   return __extension__ (__m256i)(__v4di){ __D, __C, __B, __A };
@@ -127,12 +178,18 @@ __m256i a, b;
 	a = avx256_ls(a,2);
 	
 	out(a);
-	   
-	b = _mm256_set_epi64x(0X1249249249249249, 0X2492492492492492, 0X4924924924924924, 0X9249249249249249);
-
-	b = avx256_roll(b,3);
 	
-	out(b);
+	a = _mm256_set_epi64x(0X1020408102040810, 0X2040810204081020, 0X4081020408102040, 0X8102040810204081);
+
+	a = avx256_ls_improved(a,2);
+	
+	out(a);
+
+	a = _mm256_set_epi64x(0X1249249249249249, 0X2492492492492492, 0X4924924924924924, 0X9249249249249249);
+
+	a = avx256_roll(a,3);
+	
+	out(a);
 	
 	return 0;
 }
