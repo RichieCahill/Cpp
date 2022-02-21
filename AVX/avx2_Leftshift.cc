@@ -48,7 +48,7 @@ __m256i avx256_ls (__m256i n, int64_t s){
 	rail0 = rail0 >> (64-s);
 
 	temp = _mm256_set_epi64x(rail2, rail1, rail0, 0X0000000000000000);
-	
+
 	n = n << s;
 
 	n = _mm256_or_si256(n, temp);
@@ -88,21 +88,39 @@ __m256i avx256_ls_improved (__m256i n, int s){
 	return n;
 }
 
+/*
+//hand made
+															Arch	Latency (CPI)
+_mm256_extracti128_si256 = Skylake				3		1
+_mm_extract_epi64 = Skylake								3		1
+_mm256_set_m128i = Skylake								3		1
 
-//asm testing
-__m256i avx256_ls_asm (__m256i n, int64_t s){
+total 20 6.83
++			 ? ?    for _mm_set_epi64x
+
+
+_mm_load may be how to build avx registers
+*/
+
+__m256i avx256_ls_test (__m256i n, int64_t s){
 	__m256i temp;
-	
+	__m128i t128_0, t128_1;
+	uint64_t t64_0, t64_1;
 
-	uint64_t rail2 = _mm256_extract_epi64(n, 2), rail1 = _mm256_extract_epi64(n, 1), rail0 = _mm256_extract_epi64(n, 0);
+	t128_0 =	_mm256_extracti128_si256(n, 0);
+	t64_0 = _mm_extract_epi64(t128_0, 0);
+	t64_0 = t64_0>> (64-s);
+	t64_1 = _mm_extract_epi64(t128_0, 1);
+	t64_1 = t64_1>> (64-s);
+	t128_0 = _mm_set_epi64x(t64_0, 0X0000000000000000);
 	
-	rail2 = rail2 >> (64-s);
-	rail1 = rail1 >> (64-s);
-	rail0 = rail0 >> (64-s);
+	t128_1 = _mm256_extracti128_si256(n, 1);
+	t64_0 = _mm_extract_epi64(t128_1, 0);
+	t64_0 = t64_0>> (64-s);
+	t128_1	= _mm_set_epi64x(t64_0, t64_1);
 
+	temp = _mm256_set_m128i(t128_1, t128_0);
 
-	temp = _mm256_set_epi64x(rail2, rail1, rail0, 0X0000000000000000);
-	
 	n = n << s;
 
 	n = _mm256_or_si256(n, temp);
@@ -179,6 +197,12 @@ __m256i a;
 	a = avx256_ls(a,8);
 	
 	out(a);
+
+	a = _mm256_set_epi64x(0X1020408102040810, 0X2040810204081020, 0X4081020408102040, 0X8102040810204081);
+
+	a = avx256_ls_test(a,8);
+	
+	out(a);
 	
 	a = _mm256_set_epi64x(0X1020408102040810, 0X2040810204081020, 0X4081020408102040, 0X8102040810204081);
 
@@ -192,5 +216,10 @@ __m256i a;
 	
 	out(a);
 	
+
+	
+
+
+
 	return 0;
 }
