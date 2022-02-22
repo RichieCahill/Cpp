@@ -3,6 +3,7 @@
 
 
 using namespace std;
+
 void avxout(__m256i a){
 	cout << hex << _mm256_extract_epi64(a, 0) << endl;
 	cout << hex << _mm256_extract_epi64(a, 1) << endl;
@@ -10,6 +11,7 @@ void avxout(__m256i a){
 	cout << hex << _mm256_extract_epi64(a, 3) << endl;
 	cout << endl;
 }
+
 //Leftshifts a avx256 register
 __m256i avx256_ls_test (__m256i n, int64_t s){
 	if (s==0)
@@ -56,20 +58,26 @@ int main() {
 
 	constexpr uint64_t n = 3500;
 	constexpr int size = (n+511)/512;
+
 	__m256i* p = new __m256i[size];
 	__m256i temp;
 
-	for (uint32_t i = 1, j = 1; i <= size; i++) {
+	for (uint32_t i = 1; i <= size; i++) {
 		temp = _mm256_setzero_si256();
 		
 		// masks multiple of 3
-		if(i%3==1)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask3,1));
-		if(i%3==2)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask3,2));
-		if(i%3==0)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask3,0));
-
+		switch (i%3) {
+			case 0:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask3,0));
+				break;
+			case 1:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask3,1));
+				break;
+			case 2:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask3,2));
+				break;
+		}
+		
 		// masks multiple of 5
 		if(i%5==1)
 			temp = _mm256_or_si256(temp, avx256_ls_test(mask5,2));
@@ -97,13 +105,12 @@ int main() {
 			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,4));
 		if(i%7==0)
 			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,0));
-
-		avxout(temp);			
-    p[i] = temp;
+		
+		avxout(temp);
+		p[i] = temp;
 		
 	}
 	delete[] p;
-
 }
 
 /*
@@ -112,7 +119,7 @@ int main() {
 	5=   ...                           100001000010000100
 	 
 	255                      145 143 141 139 137 135 133 131 129
-		           0  1  1  1  1 0   1   1   1   1   0   1   1   1
+							 0  1  1  1  1 0   1   1   1   1   0   1   1   1
 	383                                           257
 	511                                           385
 	mask3 110110110110110110110
@@ -120,6 +127,6 @@ int main() {
 	mask7 000000100000010000001000000100000010000001
 
 	25 23 21 19 17 15 13 11 9 7 5 3 1
-     0  1  0  0  1  0  0  1 1 1 1 0
+		 0  1  0  0  1  0  0  1 1 1 1 0
 */
 
