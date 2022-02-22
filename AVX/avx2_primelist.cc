@@ -4,10 +4,10 @@
 
 using namespace std;
 void avxout(__m256i a){
-	cout << hex << _mm256_extract_epi64(a, 3) << endl;
-	cout << hex << _mm256_extract_epi64(a, 2) << endl;
-	cout << hex << _mm256_extract_epi64(a, 1) << endl;
 	cout << hex << _mm256_extract_epi64(a, 0) << endl;
+	cout << hex << _mm256_extract_epi64(a, 1) << endl;
+	cout << hex << _mm256_extract_epi64(a, 2) << endl;
+	cout << hex << _mm256_extract_epi64(a, 3) << endl;
 	cout << endl;
 }
 //Leftshifts a avx256 register
@@ -50,22 +50,56 @@ uint64_t buildmask(uint32_t k) {
 
 
 int main() {
-	__m256i mask3 = _mm256_set_epi64x(0x9249249249249249,0x2492492492492492,0x4924924924924924,0x9249249249249249);
-	constexpr int n = 2000000;
+	const __m256i mask3 = _mm256_set_epi64x(0x9249249249249249,0x2492492492492492,0x4924924924924924,0x9249249249249249);
+	const __m256i mask5 = _mm256_set_epi64x(0x8421084210842108,0x4210842108421084,0x2108421084210842,0x1084210842108421);
+	const __m256i mask7 = _mm256_set_epi64x(0x1020408102040810,0x2040810204081020,0x4081020408102040,0x8102040810204081);
+
+	constexpr uint64_t n = 3500;
 	constexpr int size = (n+511)/512;
 	__m256i* p = new __m256i[size];
+	__m256i temp;
 
-	for (uint32_t i = 0, j = 3; i < size; i++, j += 512) {
-		uint32_t pos = j%3;
-		cout << pos << endl;
-		__m256i out = avx256_ls_test(mask3 , pos);
+	for (uint32_t i = 1, j = 1; i <= size; i++) {
+		temp = _mm256_setzero_si256();
+		
+		// masks multiple of 3
+		if(i%3==1)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask3,1));
+		if(i%3==2)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask3,2));
+		if(i%3==0)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask3,0));
 
-		avxout(out);
-		// pos = (j % 5)/2;
-		// v = v | (mask5 << pos);
-		// pos = (j % 7/2);	 
-		// v = v | (mask7 << pos);			
-    // p[i] = v;
+		// masks multiple of 5
+		if(i%5==1)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask5,2));
+		if(i%5==2)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask5,1));
+		if(i%5==3)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask5,0));
+		if(i%5==4)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask5,4));
+		if(i%5==0)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask5,3));
+
+		// masks multiple of 7
+		if(i%7==1)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,3));
+		if(i%7==2)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,6));
+		if(i%7==3)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,2));
+		if(i%7==4)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,5));
+		if(i%7==5)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,1));
+		if(i%7==6)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,4));
+		if(i%7==0)
+			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,0));
+
+		avxout(temp);			
+    p[i] = temp;
 		
 	}
 	delete[] p;
@@ -84,5 +118,8 @@ int main() {
 	mask3 110110110110110110110
 	mask5 011110111101111011110
 	mask7 000000100000010000001000000100000010000001
+
+	25 23 21 19 17 15 13 11 9 7 5 3 1
+     0  1  0  0  1  0  0  1 1 1 1 0
 */
 

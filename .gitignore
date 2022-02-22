@@ -1,3 +1,4 @@
 test.*
 a.out
 fastera.cc
+my_asm_output.s
