@@ -1,6 +1,8 @@
 #include <iostream>
 #include <immintrin.h>
 #include <thread>
+#include<fstream>
+#include<string>
 
 using namespace std;
 
@@ -53,8 +55,9 @@ __m256i buildmask(uint32_t k) {
 	return t;
 }
 
-void list_generator(uint64_t s, uint64_t e){
-	
+void list_generator(uint64_t s, uint64_t e, string name){
+
+	ofstream Factfile(name);
 	//Move these out ?
 	const __m256i mask31 = buildmask(31);
 	const __m256i mask29 = buildmask(29);
@@ -115,9 +118,13 @@ void list_generator(uint64_t s, uint64_t e){
 		if(i%7==0)
 			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,0));
 		
+			Factfile << hex << _mm256_extract_epi64(temp, 0) << endl;
+			Factfile << hex << _mm256_extract_epi64(temp, 1) << endl;
+			Factfile << hex << _mm256_extract_epi64(temp, 2) << endl;
+			Factfile << hex << _mm256_extract_epi64(temp, 3) << endl;
 	}
+	Factfile.close();
 }
-
 
 
 
@@ -132,22 +139,21 @@ int main() {
 
 	const auto processor_count = thread::hardware_concurrency() - 2;
 
-	thread th1(list_generator, 1, quarter);
-	thread th2(list_generator, quarter,half);
-	thread th3(list_generator, half,topquarter);
-	thread th4(list_generator, topquarter,size);
+	thread th1(list_generator, 1, quarter, "/mnt/temp/test1.csv");
+	thread th2(list_generator, quarter, half, "/mnt/temp/test2.csv");
+	thread th3(list_generator, half, topquarter, "/mnt/temp/test3.csv");
+	thread th4(list_generator, topquarter, size, "/mnt/temp/test4.csv");
 
 
   th1.join();
 	th2.join();
   th3.join();
 	th4.join();
-	cout << dec << processor_count << endl;
 
 }
 
 /*
-	Multy threading is 2x to 4x slower
+	Multy threading is 2x to 4x slower cout was causing problems
 	testing 3,5 and 7
 	1000000000 1 threds
 	run 1 ./a.out  3.05s user 8.52s system 69% cpu 16.759 total
@@ -162,6 +168,20 @@ int main() {
 	run 4 ./a.out  13.48s user 38.10s system 174% cpu 29.639 total
 	run 5 ./a.out  13.40s user 38.31s system 172% cpu 29.952 total
 
+	Writing to a file
+	10000000000 1 threds
+	run 1 ./a.out  21.81s user 73.79s system 99% cpu 1:36.38 total
+	run 2 ./a.out  21.29s user 72.69s system 98% cpu 1:35.05 total
+	run 3 ./a.out  21.86s user 72.85s system 98% cpu 1:35.77 total
+	run 4
+	run 5 
+
+	10000000000 4 threds 
+	run 1 ./a.out  22.10s user 75.97s system 397% cpu 24.696 total
+	run 2 ./a.out  21.95s user 102.12s system 394% cpu 31.420 total
+	run 3 ./a.out  22.16s user 100.41s system 374% cpu 32.709 total
+	run 4
+	run 5
 
 
 	
