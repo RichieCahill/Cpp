@@ -115,8 +115,6 @@ void list_generator(uint64_t s, uint64_t e){
 		if(i%7==0)
 			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,0));
 		
-		avxout(temp);
-		
 	}
 }
 
@@ -126,7 +124,7 @@ void list_generator(uint64_t s, uint64_t e){
 
 int main() {
 
-	constexpr uint64_t n = 1000000000;
+	constexpr uint64_t n = 10000000000;
 	constexpr int size = (n+511)/512;
 	constexpr int half = size/2;
 	constexpr int quarter = size/4;
@@ -134,27 +132,27 @@ int main() {
 
 	const auto processor_count = thread::hardware_concurrency() - 2;
 
-	thread th1(list_generator, 1, size);
-	// thread th2(list_generator, quarter,half);
-	// thread th3(list_generator, half,topquarter);
-	// thread th4(list_generator, topquarter,size);
+	thread th1(list_generator, 1, quarter);
+	thread th2(list_generator, quarter,half);
+	thread th3(list_generator, half,topquarter);
+	thread th4(list_generator, topquarter,size);
 
 
   th1.join();
-	// th2.join();
-  // th3.join();
-	// th4.join();
+	th2.join();
+  th3.join();
+	th4.join();
 	cout << dec << processor_count << endl;
 
 }
 
 /*
+	Multy threading is 2x to 4x slower
 	testing 3,5 and 7
 	1000000000 1 threds
 	run 1 ./a.out  3.05s user 8.52s system 69% cpu 16.759 total
 	run 2 ./a.out  2.91s user 8.76s system 68% cpu 17.029 total
 	run 3 ./a.out  3.09s user 8.52s system 68% cpu 16.974 total
-	4x faster then yesterday
 	1000000000 2 threds 
 	run 1 1:00.18
 	1000000000 4 threds 
