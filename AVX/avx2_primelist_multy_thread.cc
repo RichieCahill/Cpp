@@ -1,17 +1,25 @@
 /*
 resorest
 timehttps://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#
-https://github.com/ahuston-0 helped with multithreading[]
+https://github.com/ahuston-0 helped with multithreading
+https://stackoverflow.com/questions/11103249/raw-file-format-c
+0is can be prime 1 isnt
+
+TODO
+Make it out to a vector instead of a file
+and output that vector to a file
 */
+
 #include <iostream>
 #include <immintrin.h>
 #include <thread>
-#include<fstream>
-#include<string>
+#include <fstream>
+#include <string>
 #include <vector>
 
 using namespace std;
 
+//couts an AVX register right to left
 void avxout(__m256i a){
 	cout << hex << _mm256_extract_epi64(a, 0) << endl;
 	cout << hex << _mm256_extract_epi64(a, 1) << endl;
@@ -62,9 +70,12 @@ __m256i buildmask(uint32_t k) {
 }
 
 void list_generator(uint64_t s, uint64_t e, string name){
-
-	ofstream Factfile(name);
+	//creath the file the it outputs to
+	ofstream Factfile(name, ios::out | ios::binary);
+	
 	//Move these out ?
+	//set all the mask valus
+	//i set 13 to 3 to save the regsters and time that leftshifting takes
 	const __m256i mask31 = buildmask(31);
 	const __m256i mask29 = buildmask(29);
 	const __m256i mask23 = buildmask(23);
@@ -75,11 +86,11 @@ void list_generator(uint64_t s, uint64_t e, string name){
 	const __m256i mask7 = _mm256_set_epi64x(0x1020408102040810,0x2040810204081020,0x4081020408102040,0x8102040810204081);
 	const __m256i mask5 = _mm256_set_epi64x(0x8421084210842108,0x4210842108421084,0x2108421084210842,0x1084210842108421);
 	const __m256i mask3 = _mm256_set_epi64x(0x9249249249249249,0x2492492492492492,0x4924924924924924,0x9249249249249249);
-
+	
 	__m256i temp;
 
+	//loos form s to e making the temp register piking mask based on counter
 	for (uint32_t i = s; i < e; i++) {
-
 
 		temp = _mm256_setzero_si256();
 
@@ -124,31 +135,36 @@ void list_generator(uint64_t s, uint64_t e, string name){
 		if(i%7==0)
 			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,0));
 
-			Factfile << hex << _mm256_extract_epi64(temp, 0) << endl;
-			Factfile << hex << _mm256_extract_epi64(temp, 1) << endl;
-			Factfile << hex << _mm256_extract_epi64(temp, 2) << endl;
-			Factfile << hex << _mm256_extract_epi64(temp, 3) << endl;
+			//Outputs the avx register to disk in raw
+			Factfile.write ((char*)&temp, sizeof (temp));
 	}
 	Factfile.close();
 }
 
 
-
-
 int main() {
-
-	constexpr uint64_t n = 120000000000;
+	//the number you arc computing to
+	constexpr uint64_t n = 240000000000;
+	//adding allocating the number spaces a vector needs
 	constexpr uint32_t size = (n+511)/512;
-	const auto processor_count = thread::hardware_concurrency()-2;
+	//get the total number of prosesor on the machesn
+	const auto processor_count = thread::hardware_concurrency();
 	// const uint32_t processor_count = 4;
-	const uint32_t test = (size-(size%processor_count)+size)/processor_count;
+
+	//divides the work into processor_count of equal pieces
+	const uint32_t piece = (size-(size%processor_count)+size)/processor_count;
 
 	uint32_t start = 1;
 	
-	//creatts a vector of threds
+	//create a vector of threads
 	vector<thread> t;
 
+	//creat thred till the processor_count
+	//alice helped with the for loop that creats the threds
 	for(int i = 0; i < processor_count; i++){
+
+		//make output file and atempts to imcrment it 
+		// it doesn't work i getting ASCII value not numbers
 		string file = "/mnt/temp/test";
 		char c = i;
 		cout << c << endl;
@@ -156,13 +172,17 @@ int main() {
 		file += ".csv";
 		cout << file << endl;
 		 
-		uint32_t end=test+start;
+		//sets the ending position of the fuction
+		uint32_t end=piece+start;
   	
+		//spawns a thread with the list generator
 		t.emplace_back(list_generator, start, end, file);
 		
+		//seth the start to the ole ned for the net iteration
 		start = end;
 	}
-	
+
+	//Joins all the thread at the end
 	for(auto&& e: t){
   	e.join();
 	} 
@@ -223,15 +243,35 @@ int main() {
 	run 1 ./a.out  591.92s user 4497.66s system 856% cpu 9:54.32 total
 	run 2 
 
-	I think im hit thermal limits
+	10000000000 10 threds 
+	run 1 ./a.out  54.95s user 311.72s system 950% cpu 38.589 total	
+
+	I maybe hit thermal limits and defnlty hit io limits
 	120000000000 10 threds 
 	run 1 ./a.out  673.54s user 5868.22s system 978% cpu 11:08.65 total
-	run 2 
+	run 2 ./a.out  678.23s user 8240.52s system 984% cpu 15:05.88 total
+	run 3 ./a.out  664.31s user 6272.40s system 970% cpu 11:54.43 total
 
 	120000000000 12 threds 
 	run 1 ./a.out  689.78s user 6498.34s system 1073% cpu 11:09.32 total
 	run 2 
 
+	improved wrighting directly wright avx regiuster raw 17x faster
+	120000000000 10 threds 
+	run 1 ./a.out  29.39s user 34.28s system 152% cpu 41.773 total
+	run 2 ./a.out  12.09s user 15.64s system 66% cpu 41.807 total
+	run 3 ./a.out  19.02s user 22.29s system 99% cpu 41.681 total
+	run 4
+
+	120000000000 12 threds 
+	run 1 ./a.out  15.93s user 19.96s system 85% cpu 41.733 total
+	run 2	./a.out  30.13s user 34.15s system 153% cpu 41.775 total
+
+	
+	2400000000000 12 threds 
+	run 1 ./a.out  35.96s user 37.74s system 97% cpu 1:15.46 total
+	run 2 ./a.out  31.63s user 35.98s system 89% cpu 1:15.49 total
+	run 3 ./a.out  40.47s user 46.23s system 114% cpu 1:15.51 total
 
 	127 125 123 121 ...25 23 21 19 17 15 13 11 9 7 5 3 1
 	3=   ...                    1001001001001001001001001
