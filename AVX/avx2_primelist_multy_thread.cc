@@ -1,12 +1,14 @@
 /*
 resorest
 timehttps://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#
+https://github.com/ahuston-0 helped with multithreading[]
 */
 #include <iostream>
 #include <immintrin.h>
 #include <thread>
 #include<fstream>
 #include<string>
+#include <vector>
 
 using namespace std;
 
@@ -135,55 +137,42 @@ void list_generator(uint64_t s, uint64_t e, string name){
 
 int main() {
 
-	constexpr uint64_t n = 10000000000;
+	constexpr uint64_t n = 120000000000;
 	constexpr uint32_t size = (n+511)/512;
-	// const auto processor_count = thread::hardware_concurrency() - 2;
-	const uint32_t processor_count = 4;
+	const auto processor_count = thread::hardware_concurrency()-2;
+	// const uint32_t processor_count = 4;
 	const uint32_t test = (size-(size%processor_count)+size)/processor_count;
 
 	uint32_t start = 1;
-	uint32_t a=test+start;
-	uint32_t b=a+test;
-	uint32_t c=b+test;
-	uint32_t d=c+test;
 	
-	cout << a << endl;
-	cout << b << endl;
-	cout << c << endl;
-	cout << d << endl;
+	//creatts a vector of threds
+	vector<thread> t;
 
-	thread th1(list_generator, start, a, "/mnt/temp/test1.csv");
-	thread th2(list_generator, a, b, "/mnt/temp/test2.csv");
-	thread th3(list_generator, b, c, "/mnt/temp/test3.csv");
-	thread th4(list_generator, c, d, "/mnt/temp/test4.csv");
-
-
-	th1.join();
-	th2.join();
-	th3.join();
-	th4.join();
-
-	/*
-	uint32_t start = 1;
-	for (uint32_t i = 0; i <= processor_count; i++){
+	for(int i = 0; i < processor_count; i++){
+		string file = "/mnt/temp/test";
+		char c = i;
+		cout << c << endl;
+		file += c;
+		file += ".csv";
+		cout << file << endl;
+		 
 		uint32_t end=test+start;
-		thread th1(list_generator, start, end, "/mnt/temp/test1.csv");
+  	
+		t.emplace_back(list_generator, start, end, file);
+		
 		start = end;
 	}
-
-	for (uint32_t i = 0; i <= processor_count; i++){
-		uint32_t end=test+start;
-		th1.join();
-		start = end;
-	}
-	*/
-
+	
+	for(auto&& e: t){
+  	e.join();
+	} 
 }
+
 
 /*
 	Multy threading is 2x to 4x slower cout was causing problems
-	testing 3,5 and 7 02/22
-	1000000000 1 threds
+	testing 3,5 and 7 02/22 8700k
+	1000000000 1 threds 
 	run 1 ./a.out  3.05s user 8.52s system 69% cpu 16.759 total
 	run 2 ./a.out  2.91s user 8.76s system 68% cpu 17.029 total
 	run 3 ./a.out  3.09s user 8.52s system 68% cpu 16.974 total
@@ -196,15 +185,15 @@ int main() {
 	run 4 ./a.out  13.48s user 38.10s system 174% cpu 29.639 total
 	run 5 ./a.out  13.40s user 38.31s system 172% cpu 29.952 total
 
-	Writing to a file 02/22
-	10000000000 1 threds 
+	Writing to a file 02/22 8700k
+	10000000000 1 threds
 	run 1 ./a.out  21.81s user 73.79s system 99% cpu 1:36.38 total
 	run 2 ./a.out  21.29s user 72.69s system 98% cpu 1:35.05 total
 	run 3 ./a.out  21.86s user 72.85s system 98% cpu 1:35.77 total
 	run 4
 	run 5
 
-	10000000000 4 threds
+	10000000000 4 threds 
 	run 1 ./a.out  22.10s user 75.97s system 397% cpu 24.696 total
 	run 2 ./a.out  21.95s user 102.12s system 394% cpu 31.420 total
 	run 3 ./a.out  22.16s user 100.41s system 374% cpu 32.709 total
@@ -212,12 +201,37 @@ int main() {
 	run 5
 
 
-	10000000000 4 threds 02/23
+	10000000000 4 threds 02/23 
 	run 1 ./a.out  45.86s user 349.25s system 393% cpu 1:40.38 total
 	run 2 ./a.out  45.90s user 352.49s system 392% cpu 1:41.53 total
 	run 3 ./a.out  52.83s user 357.83s system 392% cpu 1:44.66 total
-	run 4
+	run 4 
 	run 5 
+
+	10000000000 9 threds 
+	run 1 ./a.out  52.03s user 486.78s system 861% cpu 1:02.58 total
+	run 2 
+
+	
+	20000000000 9 threds
+	run 1 ./a.out  109.17s user 964.13s system 870% cpu 2:03.35 total
+	run 2 ./a.out  102.08s user 971.09s system 872% cpu 2:02.99 total
+	run 3 
+
+	
+	120000000000 9 threds 
+	run 1 ./a.out  591.92s user 4497.66s system 856% cpu 9:54.32 total
+	run 2 
+
+	I think im hit thermal limits
+	120000000000 10 threds 
+	run 1 ./a.out  673.54s user 5868.22s system 978% cpu 11:08.65 total
+	run 2 
+
+	120000000000 12 threds 
+	run 1 ./a.out  689.78s user 6498.34s system 1073% cpu 11:09.32 total
+	run 2 
+
 
 	127 125 123 121 ...25 23 21 19 17 15 13 11 9 7 5 3 1
 	3=   ...                    1001001001001001001001001
