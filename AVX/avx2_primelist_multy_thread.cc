@@ -1,13 +1,19 @@
 /*
 resorest
 timehttps://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#
-https://github.com/ahuston-0 helped with multithreading
 https://stackoverflow.com/questions/11103249/raw-file-format-c
-0is can be prime 1 isnt
+
+https://github.com/ahuston-0 Helped with multithreading
+https://github.com/DerDennisOP Helped with the leftshits amount
+
+g++ -O3 -g -mavx -pthread -march=native ./avx2_primelist_multy_thread.cc
+
+0 is can be prime 1 isnt
 
 TODO
 Make it out to a vector instead of a file
 and output that vector to a file
+look into the for loop alternitve
 */
 
 #include <iostream>
@@ -72,7 +78,7 @@ __m256i buildmask(uint32_t k) {
 void list_generator(uint64_t s, uint64_t e, string name){
 	//creath the file the it outputs to
 	ofstream Factfile(name, ios::out | ios::binary);
-	
+
 	//Move these out ?
 	//set all the mask valus
 	//i set 13 to 3 to save the regsters and time that leftshifting takes
@@ -86,7 +92,7 @@ void list_generator(uint64_t s, uint64_t e, string name){
 	const __m256i mask7 = _mm256_set_epi64x(0x1020408102040810,0x2040810204081020,0x4081020408102040,0x8102040810204081);
 	const __m256i mask5 = _mm256_set_epi64x(0x8421084210842108,0x4210842108421084,0x2108421084210842,0x1084210842108421);
 	const __m256i mask3 = _mm256_set_epi64x(0x9249249249249249,0x2492492492492492,0x4924924924924924,0x9249249249249249);
-	
+
 	__m256i temp;
 
 	//loos form s to e making the temp register piking mask based on counter
@@ -108,32 +114,99 @@ void list_generator(uint64_t s, uint64_t e, string name){
 		}
 
 		// masks multiple of 5
-		if(i%5==1)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask5,2));
-		if(i%5==2)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask5,1));
-		if(i%5==3)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask5,0));
-		if(i%5==4)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask5,4));
-		if(i%5==0)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask5,3));
+		switch (i%5) {
+			case 0:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,3));
+				break;
+			case 1:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,1));
+				break;
+			case 2:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,2));
+				break;
+			case 3:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,0));
+				break;
+			case 4:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,4));
+				break;
+		}
+
+		//This will in theroy do the same as above dosent work yet
+		//Made by DerDennisOP
+		// uint32_t temp2;
+		// for (uint32_t j = 0; j < 5; j++){
+			// if ((i%5)==j){
+				// temp2 =(3-j);
+				// if (temp2<0){
+					// temp2=4;
+				// }
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask5,temp2));
+				// break;
+			// }
+		// }
 
 		// masks multiple of 7
-		if(i%7==1)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,3));
-		if(i%7==2)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,6));
-		if(i%7==3)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,2));
-		if(i%7==4)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,5));
-		if(i%7==5)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,1));
-		if(i%7==6)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,4));
-		if(i%7==0)
-			temp = _mm256_or_si256(temp, avx256_ls_test(mask7,0));
+		switch (i%7) {
+			case 1:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,3));
+				break;
+			case 2:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,6));
+				break;
+			case 3:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,2));
+				break;
+			case 4:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,5));
+				break;
+			case 5:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,1));
+				break;
+			case 6:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,4));
+				break;
+			case 0:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,0));
+				break;
+		}
+
+		// masks multiple of 11
+		switch (i%11) {
+			case 1:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,4));
+				break;
+			case 2:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,1));
+				break;
+			case 3:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,9));
+				break;
+			case 4:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,6));
+				break;
+			case 5:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,3));
+				break;
+			case 6:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,0));
+				break;
+			case 7:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,8));
+				break;
+			case 8:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,5));
+				break;
+			case 9:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,2));
+				break;
+			case 10:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,10));
+				break;
+			case 0:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,7));
+				break;
+		}
 
 			//Outputs the avx register to disk in raw
 			Factfile.write ((char*)&temp, sizeof (temp));
@@ -146,24 +219,24 @@ int main() {
 	//the number you arc computing to
 	constexpr uint64_t n = 240000000000;
 	//adding allocating the number spaces a vector needs
-	constexpr uint32_t size = (n+511)/512;
-	//get the total number of prosesor on the machesn
-	const auto processor_count = thread::hardware_concurrency();
-	// const uint32_t processor_count = 4;
-
+	constexpr uint64_t size = (n+511)/512;
+	//get the total number of processor on the machine
+	// const auto processor_count = thread::hardware_concurrency();
+	constexpr uint64_t processor_count = 12;
 	//divides the work into processor_count of equal pieces
-	const uint32_t piece = (size-(size%processor_count)+size)/processor_count;
-
-	uint32_t start = 1;
+	const uint64_t piece = (processor_count-(size%processor_count)+size)/processor_count;
+	cout << piece << endl;
 	
+	uint32_t start = 1;
+
 	//create a vector of threads
 	vector<thread> t;
 
-	//creat thred till the processor_count
-	//alice helped with the for loop that creats the threds
+	//creat threads till the processor_count
+	//alice helped with the for loop that create the threads
 	for(int i = 0; i < processor_count; i++){
 
-		//make output file and atempts to imcrment it 
+		//make output file and attempts to increment it
 		// it doesn't work i getting ASCII value not numbers
 		string file = "/mnt/temp/test";
 		char c = i;
@@ -171,13 +244,13 @@ int main() {
 		file += c;
 		file += ".csv";
 		cout << file << endl;
-		 
+
 		//sets the ending position of the fuction
 		uint32_t end=piece+start;
-  	
+
 		//spawns a thread with the list generator
 		t.emplace_back(list_generator, start, end, file);
-		
+
 		//seth the start to the ole ned for the net iteration
 		start = end;
 	}
@@ -185,14 +258,14 @@ int main() {
 	//Joins all the thread at the end
 	for(auto&& e: t){
   	e.join();
-	} 
+	}
 }
 
 
 /*
 	Multy threading is 2x to 4x slower cout was causing problems
 	testing 3,5 and 7 02/22 8700k
-	1000000000 1 threds 
+	1000000000 1 threds
 	run 1 ./a.out  3.05s user 8.52s system 69% cpu 16.759 total
 	run 2 ./a.out  2.91s user 8.76s system 68% cpu 17.029 total
 	run 3 ./a.out  3.09s user 8.52s system 68% cpu 16.974 total
@@ -213,7 +286,7 @@ int main() {
 	run 4
 	run 5
 
-	10000000000 4 threds 
+	10000000000 4 threds
 	run 1 ./a.out  22.10s user 75.97s system 397% cpu 24.696 total
 	run 2 ./a.out  21.95s user 102.12s system 394% cpu 31.420 total
 	run 3 ./a.out  22.16s user 100.41s system 374% cpu 32.709 total
@@ -221,57 +294,88 @@ int main() {
 	run 5
 
 
-	10000000000 4 threds 02/23 
+	10000000000 4 threds 02/23
 	run 1 ./a.out  45.86s user 349.25s system 393% cpu 1:40.38 total
 	run 2 ./a.out  45.90s user 352.49s system 392% cpu 1:41.53 total
 	run 3 ./a.out  52.83s user 357.83s system 392% cpu 1:44.66 total
-	run 4 
-	run 5 
+	run 4
+	run 5
 
-	10000000000 9 threds 
+	10000000000 9 threds
 	run 1 ./a.out  52.03s user 486.78s system 861% cpu 1:02.58 total
-	run 2 
+	run 2
 
-	
+
 	20000000000 9 threds
 	run 1 ./a.out  109.17s user 964.13s system 870% cpu 2:03.35 total
 	run 2 ./a.out  102.08s user 971.09s system 872% cpu 2:02.99 total
-	run 3 
+	run 3
 
-	
-	120000000000 9 threds 
+
+	120000000000 9 threds
 	run 1 ./a.out  591.92s user 4497.66s system 856% cpu 9:54.32 total
-	run 2 
+	run 2
 
-	10000000000 10 threds 
-	run 1 ./a.out  54.95s user 311.72s system 950% cpu 38.589 total	
+	10000000000 10 threds
+	run 1 ./a.out  54.95s user 311.72s system 950% cpu 38.589 total
 
 	I maybe hit thermal limits and defnlty hit io limits
-	120000000000 10 threds 
+	120000000000 10 threds
 	run 1 ./a.out  673.54s user 5868.22s system 978% cpu 11:08.65 total
 	run 2 ./a.out  678.23s user 8240.52s system 984% cpu 15:05.88 total
 	run 3 ./a.out  664.31s user 6272.40s system 970% cpu 11:54.43 total
 
-	120000000000 12 threds 
+	120000000000 12 threds
 	run 1 ./a.out  689.78s user 6498.34s system 1073% cpu 11:09.32 total
-	run 2 
+	run 2
 
 	improved wrighting directly wright avx regiuster raw 17x faster
-	120000000000 10 threds 
+	120000000000 10 threds
 	run 1 ./a.out  29.39s user 34.28s system 152% cpu 41.773 total
 	run 2 ./a.out  12.09s user 15.64s system 66% cpu 41.807 total
 	run 3 ./a.out  19.02s user 22.29s system 99% cpu 41.681 total
 	run 4
 
-	120000000000 12 threds 
+	120000000000 12 threds
 	run 1 ./a.out  15.93s user 19.96s system 85% cpu 41.733 total
 	run 2	./a.out  30.13s user 34.15s system 153% cpu 41.775 total
 
-	
-	2400000000000 12 threds 
+
+	2400000000000 12 threds
 	run 1 ./a.out  35.96s user 37.74s system 97% cpu 1:15.46 total
 	run 2 ./a.out  31.63s user 35.98s system 89% cpu 1:15.49 total
 	run 3 ./a.out  40.47s user 46.23s system 114% cpu 1:15.51 total
+	run 4 ./a.out  52.40s user 63.97s system 154% cpu 1:15.49 total
+	run 5 ./a.out  41.88s user 34.68s system 91% cpu 1:23.66 total
+
+
+	testing 3,5,7 and 11 02/24 8700k
+	120000000000 12 threds
+	Not optane
+	run 1 ./a.out  41.24s user 15.37s system 265% cpu 21.296 total 
+
+	run 1 ./a.out  29.38s user 11.23s system 181% cpu 22.391 total
+
+	Optane
+	run 1 ./a.out  44.64s user 23.47s system 175% cpu 38.760 total 
+	run 2 ./a.out  38.56s user 22.43s system 145% cpu 41.873 total
+
+
+
+	testing 3,5,7 and 11 02/24 8700k not optane and fixed the dobling bug
+	
+	120000000000 12 threds
+	run 1 ./a.out  17.40s user 7.61s system 275% cpu 9.072 total
+
+	240000000000 12 threds
+	run 1 ./a.out  33.01s user 13.14s system 187% cpu 24.612 total
+
+	testing 3,5,7 and 11 02/24 
+
+	2400000000000 64 threds AMD EPYC 7551
+	run 1 ./a.out  295.25s user 195.70s system 742% cpu 1:06.09 total
+
+
 
 	127 125 123 121 ...25 23 21 19 17 15 13 11 9 7 5 3 1
 	3=   ...                    1001001001001001001001001
