@@ -103,32 +103,32 @@ void list_generator(uint64_t s, uint64_t e, string name){
 		// masks multiple of 3
 		switch (i%3) {
 			case 0:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask3,0));
-				break;
-			case 1:
 				temp = _mm256_or_si256(temp, avx256_ls_test(mask3,2));
 				break;
-			case 2:
+			case 1:
 				temp = _mm256_or_si256(temp, avx256_ls_test(mask3,1));
+				break;
+			case 2:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask3,0));
 				break;
 		}
 
 		// masks multiple of 5
 		switch (i%5) {
-			case 0:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,3));
-				break;
 			case 1:
 				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,1));
 				break;
 			case 2:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,2));
-				break;
-			case 3:
 				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,0));
 				break;
-			case 4:
+			case 3:
 				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,4));
+				break;
+			case 4:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,3));
+				break;
+			case 0:
+				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,2));
 				break;
 		}
 
@@ -136,14 +136,14 @@ void list_generator(uint64_t s, uint64_t e, string name){
 		//Made by DerDennisOP
 		// uint32_t temp2;
 		// for (uint32_t j = 0; j < 5; j++){
-			// if ((i%5)==j){
-				// temp2 =(3-j);
-				// if (temp2<0){
-					// temp2=4;
-				// }
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask5,temp2));
-				// break;
-			// }
+		// 	if ((i%5)==j){
+		// 		temp2 =(3-j);
+		// 		if (temp2<=0){
+		// 			temp2=4;
+		// 		}
+		// 		temp = _mm256_or_si256(temp, avx256_ls_test(mask5,temp2));
+		// 		break;
+		// 	}
 		// }
 
 		// masks multiple of 7
@@ -369,17 +369,17 @@ int main() {
 
 	240000000000 12 threds
 	run 1 ./a.out  33.01s user 13.14s system 187% cpu 24.612 total
+	10,000,000,000/s
 
-	testing 3,5,7 and 11 02/24 
-
-	2400000000000 64 threds AMD EPYC 7551
+	testing 3,5,7 and 11 02/24 AMD EPYC 7551 
+	2400000000000 64 threds 
 	run 1 ./a.out  295.25s user 195.70s system 742% cpu 1:06.09 total
-
+	36,363,636,363/s
 
 
 	127 125 123 121 ...25 23 21 19 17 15 13 11 9 7 5 3 1
-	3=   ...                    1001001001001001001001001
-	5=   ...                           100001000010000100
+	3=   ...                  10010010010010010010010010
+	5=   ...                          100001000010000100
 
 	255                      145 143 141 139 137 135 133 131 129
 							 0  1  1  1  1 0   1   1   1   1   0   1   1   1
@@ -391,5 +391,13 @@ int main() {
 
 	25 23 21 19 17 15 13 11 9 7 5 3 1
 		 0  1  0  0  1  0  0  1 1 1 1 0
+		 
+		 00100001 0100001
+		 01001001 0010010  10010010
+		 13579-35 79-3579- 3579-
+		 00000000000000000000000000000000000000000000
+		 001000010000100001000010000100001000010000100001
+		 00010000001000000100000010000001000000100000010000001
+		 01111001001011001101001011
 */
 
