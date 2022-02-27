@@ -3,7 +3,7 @@ resorest
 timehttps://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#
 https://stackoverflow.com/questions/11103249/raw-file-format-c
 
-https://github.com/ahuston-0 Helped with multithreading
+https://github.com/ahuston-0 Helped with multithreading Figured out a figured out the algrithum to leftshift 3 and 5
 https://github.com/DerDennisOP Helped with the leftshits amount
 
 g++ -O3 -g -mavx -pthread -march=native ./avx2_primelist_multy_thread.cc
@@ -100,116 +100,107 @@ void list_generator(uint64_t s, uint64_t e, string name){
 
 		temp = _mm256_setzero_si256();
 
+		//k= numbe of in sequens of primes n = nebut your masking i bing posioion in list
+		// (n+(n-k)-(i%n))%n
+
 		// masks multiple of 3
-		switch (i%3) {
-			case 0:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask3,2));
-				break;
-			case 1:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask3,1));
-				break;
-			case 2:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask3,0));
-				break;
-		}
+		temp = _mm256_or_si256(temp, avx256_ls_test(mask3,2-(i%3)));
+		// temp = _mm256_or_si256(temp, avx256_ls_test(mask3, (5-(i%3))%3));
 
 		// masks multiple of 5
-		switch (i%5) {
-			case 1:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,1));
-				break;
-			case 2:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,0));
-				break;
-			case 3:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,4));
-				break;
-			case 4:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,3));
-				break;
-			case 0:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask5,2));
-				break;
-		}
-
-		//This will in theroy do the same as above dosent work yet
-		//Made by DerDennisOP
-		// uint32_t temp2;
-		// for (uint32_t j = 0; j < 5; j++){
-		// 	if ((i%5)==j){
-		// 		temp2 =(3-j);
-		// 		if (temp2<=0){
-		// 			temp2=4;
-		// 		}
-		// 		temp = _mm256_or_si256(temp, avx256_ls_test(mask5,temp2));
-		// 		break;
-		// 	}
-		// }
+		//patern 2 1 0 4 3
+		temp = _mm256_or_si256(temp, avx256_ls_test(mask5,(8-(i%5))%5));
 
 		// masks multiple of 7
-		switch (i%7) {
-			case 1:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,3));
-				break;
-			case 2:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,6));
-				break;
-			case 3:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,2));
-				break;
-			case 4:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,5));
-				break;
-			case 5:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,1));
-				break;
-			case 6:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,4));
-				break;
-			case 0:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask7,0));
-				break;
-		}
+		temp = _mm256_or_si256(temp, avx256_ls_test(mask7,(11*i-(i%7))%7));
 
 		// masks multiple of 11
-		switch (i%11) {
-			case 1:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,4));
-				break;
-			case 2:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,1));
-				break;
-			case 3:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,9));
-				break;
-			case 4:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,6));
-				break;
-			case 5:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,3));
-				break;
-			case 6:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,0));
-				break;
-			case 7:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,8));
-				break;
-			case 8:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,5));
-				break;
-			case 9:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,2));
-				break;
-			case 10:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,10));
-				break;
-			case 0:
-				temp = _mm256_or_si256(temp, avx256_ls_test(mask11,7));
-				break;
-		}
+		//pttern 4 1 9 6 3 0 8 5 2 10 7
+		// int n = 11, k =5;
+		// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,(14*i-(i%11))%11));
+		// switch (i%11) {
+			// case 1:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,4));
+				// break;
+			// case 2:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,1));
+				// break;
+			// case 3:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,9));
+				// break;
+			// case 4:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,6));
+				// break;
+			// case 5:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,3));
+				// break;
+			// case 6:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,0));
+				// break;
+			// case 7:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,8));
+				// break;
+			// case 8:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,5));
+				// break;
+			// case 9:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,2));
+				// break;
+			// case 10:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,10));
+				// break;
+			// case 0:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,7));
+				// break;
+		// }
 
-			//Outputs the avx register to disk in raw
-			Factfile.write ((char*)&temp, sizeof (temp));
+		// masks multiple of 11
+		//pttern 5 9 0 4 8 12 3 7 11 2 6 10 1
+		// switch (i%13) {
+			// case 1:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,5));
+				// break;
+			// case 2:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,9));
+				// break;
+			// case 3:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,0));
+				// break;
+			// case 4:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,4));
+				// break;
+			// case 5:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,8));
+				// break;
+			// case 6:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,12));
+				// break;
+			// case 7:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,3));
+				// break;
+			// case 8:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,7));
+				// break;
+			// case 9:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,11));
+				// break;
+			// case 10:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,2));
+				// break;
+			// case 11:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,6));
+				// break;
+			// case 12:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,10));
+				// break;
+			// case 0:
+				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,1));
+				// break;
+		// }
+
+		//Outputs the avx register to disk in raw
+		Factfile.write ((char*)&temp, sizeof (temp));
+		avxout(temp);
 	}
 	Factfile.close();
 }
@@ -217,16 +208,17 @@ void list_generator(uint64_t s, uint64_t e, string name){
 
 int main() {
 	//the number you arc computing to
-	constexpr uint64_t n = 240000000000;
+	constexpr uint64_t n = 24000;
 	//adding allocating the number spaces a vector needs
 	constexpr uint64_t size = (n+511)/512;
 	//get the total number of processor on the machine
 	// const auto processor_count = thread::hardware_concurrency();
-	constexpr uint64_t processor_count = 12;
+	constexpr uint64_t processor_count = 4;
 	//divides the work into processor_count of equal pieces
 	const uint64_t piece = (processor_count-(size%processor_count)+size)/processor_count;
+
 	cout << piece << endl;
-	
+
 	uint32_t start = 1;
 
 	//create a vector of threads
@@ -239,7 +231,7 @@ int main() {
 		//make output file and attempts to increment it
 		// it doesn't work i getting ASCII value not numbers
 		string file = "/mnt/temp/test";
-		char c = i;
+		char c = i+48;
 		cout << c << endl;
 		file += c;
 		file += ".csv";
@@ -352,18 +344,18 @@ int main() {
 	testing 3,5,7 and 11 02/24 8700k
 	120000000000 12 threds
 	Not optane
-	run 1 ./a.out  41.24s user 15.37s system 265% cpu 21.296 total 
+	run 1 ./a.out  41.24s user 15.37s system 265% cpu 21.296 total
 
 	run 1 ./a.out  29.38s user 11.23s system 181% cpu 22.391 total
 
 	Optane
-	run 1 ./a.out  44.64s user 23.47s system 175% cpu 38.760 total 
+	run 1 ./a.out  44.64s user 23.47s system 175% cpu 38.760 total
 	run 2 ./a.out  38.56s user 22.43s system 145% cpu 41.873 total
 
 
 
 	testing 3,5,7 and 11 02/24 8700k not optane and fixed the dobling bug
-	
+
 	120000000000 12 threds
 	run 1 ./a.out  17.40s user 7.61s system 275% cpu 9.072 total
 
@@ -371,8 +363,8 @@ int main() {
 	run 1 ./a.out  33.01s user 13.14s system 187% cpu 24.612 total
 	10,000,000,000/s
 
-	testing 3,5,7 and 11 02/24 AMD EPYC 7551 
-	2400000000000 64 threds 
+	testing 3,5,7 and 11 02/24 AMD EPYC 7551
+	2400000000000 64 threds
 	run 1 ./a.out  295.25s user 195.70s system 742% cpu 1:06.09 total
 	36,363,636,363/s
 
@@ -391,7 +383,7 @@ int main() {
 
 	25 23 21 19 17 15 13 11 9 7 5 3 1
 		 0  1  0  0  1  0  0  1 1 1 1 0
-		 
+
 		 00100001 0100001
 		 01001001 0010010  10010010
 		 13579-35 79-3579- 3579-
