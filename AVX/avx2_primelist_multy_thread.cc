@@ -117,87 +117,12 @@ void list_generator(uint64_t s, uint64_t e, string name){
 		// masks multiple of 11
 		//pttern 4 1 9 6 3 0 8 5 2 10 7
 		// int n = 11, k =5;
-		// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,(14*i-(i%11))%11));
-		// switch (i%11) {
-			// case 1:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,4));
-				// break;
-			// case 2:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,1));
-				// break;
-			// case 3:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,9));
-				// break;
-			// case 4:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,6));
-				// break;
-			// case 5:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,3));
-				// break;
-			// case 6:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,0));
-				// break;
-			// case 7:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,8));
-				// break;
-			// case 8:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,5));
-				// break;
-			// case 9:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,2));
-				// break;
-			// case 10:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,10));
-				// break;
-			// case 0:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask11,7));
-				// break;
-		// }
-
+		temp = _mm256_or_si256(temp, avx256_ls_test(mask11,((9*i-4)-(i%11))%11));
+		
 		// masks multiple of 11
 		//pttern 5 9 0 4 8 12 3 7 11 2 6 10 1
-		// switch (i%13) {
-			// case 1:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,5));
-				// break;
-			// case 2:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,9));
-				// break;
-			// case 3:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,0));
-				// break;
-			// case 4:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,4));
-				// break;
-			// case 5:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,8));
-				// break;
-			// case 6:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,12));
-				// break;
-			// case 7:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,3));
-				// break;
-			// case 8:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,7));
-				// break;
-			// case 9:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,11));
-				// break;
-			// case 10:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,2));
-				// break;
-			// case 11:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,6));
-				// break;
-			// case 12:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,10));
-				// break;
-			// case 0:
-				// temp = _mm256_or_si256(temp, avx256_ls_test(mask13,1));
-				// break;
-		// }
-
+		temp = _mm256_or_si256(temp, avx256_ls_test(mask13,((5*i+1)-(i%13))%13));
+		
 		//Outputs the avx register to disk in raw
 		Factfile.write ((char*)&temp, sizeof (temp));
 		avxout(temp);
@@ -213,7 +138,7 @@ int main() {
 	constexpr uint64_t size = (n+511)/512;
 	//get the total number of processor on the machine
 	// const auto processor_count = thread::hardware_concurrency();
-	constexpr uint64_t processor_count = 4;
+	constexpr uint64_t processor_count = 1;
 	//divides the work into processor_count of equal pieces
 	const uint64_t piece = (processor_count-(size%processor_count)+size)/processor_count;
 
