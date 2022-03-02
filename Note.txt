@@ -5,3 +5,11 @@ _mm_permute
 
 _lrotl
 _lrotr
+
+FPGA
+  https://en.wikipedia.org/wiki/Barrel_shifter
+
+Scive
+  https://create.stephan-brumme.com/eratosthenes/
+  https://stackoverflow.com/questions/17241028/finding-lists-of-prime-numbers-with-simd-sse-avx
+  https://en.wikipedia.org/wiki/Wheel_factorization
