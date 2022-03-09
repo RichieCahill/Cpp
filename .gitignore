@@ -2,3 +2,5 @@ test.*
 a.out
 fastera.cc
 my_asm_output.s
+AVX2-bit-manipulation
+AVX-bit-manipulation.h

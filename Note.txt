@@ -13,3 +13,9 @@ Scive
   https://create.stephan-brumme.com/eratosthenes/
   https://stackoverflow.com/questions/17241028/finding-lists-of-prime-numbers-with-simd-sse-avx
   https://en.wikipedia.org/wiki/Wheel_factorization
+
+
+
+https://www.officedaytime.com/simd512e/
+
+https://www.nayuki.io/page/fast-fourier-transform-in-x86-assemblye
