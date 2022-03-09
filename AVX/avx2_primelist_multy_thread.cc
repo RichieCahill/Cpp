@@ -91,7 +91,7 @@ void list_generator(uint64_t s, uint64_t e, __m256i* prime){
 		// int n = 11, k =5;
 		temp = _mm256_or_si256(temp, _mm256_lls_mm256(mask11,((9*i-4)-(i%11))%11));
 
-		// masks multiple of 11
+		// masks multiple of 13
 		//pttern 5 9 0 4 8 12 3 7 11 2 6 10 1
 		temp = _mm256_or_si256(temp, _mm256_lls_mm256(mask13,((5*i+1)-(i%13))%13));
 
