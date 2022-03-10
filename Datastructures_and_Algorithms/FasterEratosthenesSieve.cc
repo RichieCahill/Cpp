@@ -27,30 +27,25 @@ uint64_t  temp = 0;
 }
 
 bool is_prime(uint64_t* prime, uint64_t pos){
-	return !(prime[pos/128] & (1ULL<<(pos%128)));
+	return !(prime[pos/128] & (1ULL<<((pos/2)%64)));
 }
 
 void clear_prime(uint64_t* prime, uint64_t pos){
-	prime[pos/128] |= (1ULL<<(pos%128));
+	prime[pos/128] |= (1ULL<<((pos/2)%64));
 }
 
 void EratosthenesSieve(uint64_t n ,uint64_t* prime,uint64_t size){
-	
-	for (uint64_t i = 0; i < size; i++)
-		prime[i]=0;
-
-	for (uint64_t i = 3; i <= n; i+=2){
-
+	for (uint64_t i = 3; i <= sqrt(n); i+=2){
 		if (is_prime(prime,i)){
 			for (uint64_t j = i*i; j <= n; j+=2*i)
 				clear_prime(prime,j);
 		}
 	}
-
 }
 
+
 int main(int argc, char const *argv[]){
-	constexpr uint64_t total = 10000;
+	constexpr uint64_t total = 10000000000;
 	constexpr uint64_t mult = (128-(total%128)+total);
 	constexpr uint64_t size = mult/128;
 	constexpr uint64_t extra = ((mult-total)/2);
@@ -61,10 +56,11 @@ int main(int argc, char const *argv[]){
 	
 	uint64_t out = counter(prime,size) - (extra-_mm_popcnt_u64(prime[size-1]>>(64-extra)));
 	
-	cout << out << endl;
+	cout << dec << out << endl;
 	
 	delete[] prime;
 	return 0;
+
 
 }
 
