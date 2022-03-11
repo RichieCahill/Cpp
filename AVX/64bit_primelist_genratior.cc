@@ -45,19 +45,20 @@ void list_generator(uint64_t s, uint64_t e, uint64_t* prime){
 
 		uint64_t temp = 0;
 
-		// patern 1 2 0
+		// pattern 1 2 0
 		uint64_t tempmask = _mm_extract_epi64(mask5_3, 0);
 		temp |=  tempmask << ((5+(6-(i%3)))%3);
-		
+
+		// pattern 2 3 4 0 1
 		tempmask = _mm_extract_epi64(mask5_3, 1);
 		temp |= tempmask << (1+(i%5))%5;
 
-		// patern 3 2 1 0 6 5 4
+		// pattern 3 2 1 0 6 5 4
 		tempmask = _mm_extract_epi64(mask11_7, 0);
 		temp |=  tempmask << (5+(6-(i%7)))%7;
 
-  	// patern 4 6 8 10 1 3 5 7 9 0 2
-		tempmask = _mm_extract_epi64(mask11_7, 1);		
+		// pattern 4 6 8 10 1 3 5 7 9 0 2
+		// tempmask = _mm_extract_epi64(mask11_7, 1);
 		// temp |=  tempmask << (6+(i%11))%11;
 
 		// tempmask = _mm_extract_epi64(mask17_13, 0);
@@ -70,26 +71,26 @@ void list_generator(uint64_t s, uint64_t e, uint64_t* prime){
 		prime[i-1]=temp;
 
 		// cout << hex << i << " " << temp << endl;
-
-
-		// avxout(temp);
 	}
 }
 
-uint64_t counter(uint64_t *prime, uint64_t size){
-	uint64_t  temp = 0;
+// counts the number prime numbers in the array minus the bits that are
+uint64_t counter(uint64_t *prime, uint64_t size, uint64_t extra){
+uint64_t  temp = 0;
 	for (uint64_t i = 0; i <= size-1; i++){
 		temp += (64-_mm_popcnt_u64(prime[i]));
 	}
-	return temp;
+	return temp - (extra-_mm_popcnt_u64(prime[size-1]>>(64-extra)));
 }
 
+// checks if bit at pos is 0
 bool is_prime(uint64_t* prime, uint64_t pos){
-	return !(prime[pos/128] & (1ULL<<((pos/2)%64)));
+	return !(prime[pos>>7] & (1ULL<<((pos>>1)%64)));
 }
 
+// checks if bit at pos is 0
 void clear_prime(uint64_t* prime, uint64_t pos){
-	prime[pos/128] |= (1ULL<<((pos/2)%64));
+	prime[pos>>7] |= (1ULL<<((pos>>1)%64));
 }
 
 void EratosthenesSieve(uint64_t n ,uint64_t* prime,uint64_t size){
@@ -103,26 +104,29 @@ void EratosthenesSieve(uint64_t n ,uint64_t* prime,uint64_t size){
 
 
 int main() {
-	//the number you are computing to
+	// The number you want to calculate to
 	constexpr uint64_t total = 10000000000;
-	//set an even multipule of 128
+	// calculates next multipule of 128 above total
 	constexpr uint64_t mult = (128-(total%128)+total);
-
-	constexpr uint64_t extra = ((mult-total)/2);
-
-	// creata am aray with the sies the mult/128
-	constexpr uint64_t size = mult/128;
+	// calculates the difference  between total nad mult
+	constexpr uint64_t extra = ((mult-total)>>1);
+	// create and list of 64bit ints 128 time smaller then mult
+	constexpr uint64_t size = mult>>7;
 	uint64_t* prime = new uint64_t[size];
 
+	clock_t t0 = clock();
 	list_generator(1,size,prime);
 
-	uint64_t out = counter(prime,size) - (extra-_mm_popcnt_u64(prime[size-1]>>(64-extra)));
 
 	EratosthenesSieve(mult,prime,size);
 
-	prime[0] = 0x7e92ed659b4b3490; 
+	clock_t t1 = clock();
+	cout << (t1-t0) * 1e-6 << '\n';
 
-	cout << counter(prime,size) - (extra-_mm_popcnt_u64(prime[size-1]>>(64-extra))) << endl;
+	// This is set the firs 64bit because list_generator dosnt properly calculate the firs bits for the number its masking
+	prime[0] = 0x7e92ed659b4b3490;
+
+	cout << dec << counter(prime,size,extra) << endl;
 
 	delete[] prime;
 	return 0;

@@ -19,3 +19,5 @@ Scive
 https://www.officedaytime.com/simd512e/
 
 https://www.nayuki.io/page/fast-fourier-transform-in-x86-assemblye
+
+https://primes.utm.edu/howmany.html
