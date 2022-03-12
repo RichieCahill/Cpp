@@ -29,7 +29,7 @@ bool is_prime(uint64_t* prime, uint64_t pos){
 
 // checks if bit at pos is 0
 void clear_prime(uint64_t* prime, uint64_t pos){
-	prime[pos>>7] |= (1ULL<<((pos>>1)%64));
+	prime[pos>>7] |= (1ULL<< ((pos>>1)%64));
 }
 
 // https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes

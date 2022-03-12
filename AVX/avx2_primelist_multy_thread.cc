@@ -29,11 +29,11 @@ tiem to beat to 10,000,000,000 12s
 
 using namespace std;
 
+const __m256i mask1 = _mm256_set_epi64x(0ULL,0ULL,0ULL,1ULL);
 
 // build a mask where every kth bit is one starting from right
 __m256i buildmask(uint32_t k) {
 	__m256i t = _mm256_setzero_si256();
-	const __m256i mask1 = _mm256_set_epi64x(0ULL,0ULL,0ULL,1ULL);
 	for (uint32_t i = 0; i < 256; i += k){
 		t = _mm256_lls_mm256(t, k);
 		t = _mm256_or_si256(t, mask1);
@@ -64,16 +64,13 @@ void list_generator(uint64_t s, uint64_t e, __m256i* prime){
 	//loos form s to e making the temp register piking mask based on counter
 	for (uint32_t i = s; i < e; i++) {
 
-		temp = _mm256_setzero_si256();
 
 		//k= numbe of in sequens of primes n = nebut your masking i bing posioion in list
 		// (n+(n-k)-(i%n))%n
 
 		// masks multiple of 3
 		//patern 1 0 2
-		// cout << 2-(i%3) << endl;
-
-		temp = _mm256_or_si256(temp, _mm256_lls_mm256(mask3,2-(i%3)));
+		temp = _mm256_lls_mm256(mask3,2-(i%3));
 		// temp = _mm256_or_si256(temp, _mm256_lls_mm256(mask3, (5-(i%3))%3));
 
 		// masks multiple of 5
@@ -89,133 +86,141 @@ void list_generator(uint64_t s, uint64_t e, __m256i* prime){
 		// masks multiple of 11
 		//pttern 4 1 9 6 3 0 8 5 2 10 7
 		// int n = 11, k =5;
-		temp = _mm256_or_si256(temp, _mm256_lls_mm256(mask11,((9*i-4)-(i%11))%11));
+		// temp = _mm256_or_si256(temp, _mm256_lls_mm256(mask11,((9*i-4)-(i%11))%11));
 
 		// masks multiple of 13
 		//pttern 5 9 0 4 8 12 3 7 11 2 6 10 1
-		temp = _mm256_or_si256(temp, _mm256_lls_mm256(mask13,((5*i+1)-(i%13))%13));
+		// temp = _mm256_or_si256(temp, _mm256_lls_mm256(mask13,((5*i+1)-(i%13))%13));
 
 		//Outputs the avx register to disk in raw
 		prime[i-1]=temp;
 		// Factfile.write ((char*)&temp, sizeof (temp));
-		avxout(temp);
 	}
 	// Factfile.close();
 }
 
 
-bool is_prime(uint64_t* prime, uint64_t pos){
-	pos/=2;
-	return !(prime[pos/64 ] & (1ULL<<(pos%64)));
+bool is_prime( __m256i* prime, uint64_t pos){
+	return _mm256_testz_si256(prime[pos/512],(_mm256_lls_mm256(mask1,((pos/2)%256))));
 }
 
-void clear_prime(uint64_t* prime, uint64_t pos){
-	pos/=2;
-	prime[pos/64] |= (1ULL<<(pos%64));
+void clear_prime(__m256i* prime, uint64_t pos){
+	prime[pos/512] = _mm256_or_si256(prime[pos/512],(_mm256_lls_mm256(mask1,((pos/2)%256))));
 }
 
-void counter(uint64_t *prime, uint64_t size){
-uint64_t temp = 0;
-	for (uint64_t i = 0; i <= size; i++){
-		temp += (64-_mm_popcnt_u64(prime[i]));
+uint64_t counter(__m256i* prime, uint64_t size){
+	__m256i count = _mm256_setzero_si256(), temp;
+	for (uint64_t i = 0; i <= size-2; i++){
+	temp = _mm256_set_epi64x(64-_mm_popcnt_u64(_mm256_extract_epi64(prime[i], 3)),64-_mm_popcnt_u64(_mm256_extract_epi64(prime[i], 2)),64-_mm_popcnt_u64(_mm256_extract_epi64(prime[i], 1)),64-_mm_popcnt_u64(_mm256_extract_epi64(prime[i], 0)));
+	count = _mm256_add_epi64(count,temp);
 	}
-cout << temp << endl;
+
+	return _mm256_extract_epi64(count, 3)+_mm256_extract_epi64(count, 2)+_mm256_extract_epi64(count, 1)+_mm256_extract_epi64(count, 0);
 }
 
-
-void EratosthenesSieve(uint64_t n ,uint64_t* prime,uint64_t size){
-	uint64_t count = 1; // special case to account for the only even prime, 2
-	
-	for (uint64_t i = 13; i <= sqrt(n); i+=2){
+void EratosthenesSieve(uint64_t n ,__m256i* prime,uint64_t size){
+	for (uint64_t i = 3; i <= sqrt(n); i+=2){
 		if (is_prime(prime,i)){
-			count++;
 			for (uint64_t j = i*i; j <= n; j+=2*i)
 				clear_prime(prime,j);
 		}
 	}
-
 }
 
 
 int main() {
 	//the number you arc computing to
-	constexpr uint64_t n = 100000000;
-	//adding allocating the number spaces a vector needs
-	constexpr uint64_t size = (n+511)/512;
+	constexpr uint64_t total = 100000256;
+	// calculates next multipule of 512 above total
+	constexpr uint64_t mult = (512-(total%512)+total);
+	// calculates the difference  between total nad mult
+	constexpr uint64_t extra = ((mult-total)/2);
+	
+	// create and list of 256bit ints 512 time smaller then mult
+	constexpr uint64_t size = mult/512;
+	__m256i* prime = new __m256i[mult];
+	cout << size << endl;
 	//get the total number of processor on the machine
 	// const auto processor_count = thread::hardware_concurrency();
-	constexpr uint64_t processor_count = 1;
+	
+	// constexpr uint64_t processor_count = 1;
 	//divides the work into processor_count of equal pieces
-	const uint64_t piece = (processor_count-(size%processor_count)+size)/processor_count;
+	// const uint64_t piece = (processor_count-(size%processor_count)+size)/processor_count;
 
-	__m256i* prime = new __m256i[size];
+	list_generator(1,size,prime);
 
-	cout << piece << endl;
+	EratosthenesSieve(mult,prime,size);
 
-	uint32_t start = 1;
+	prime[0] = _mm256_set_epi64x(_mm256_extract_epi64(prime[0], 3),_mm256_extract_epi64(prime[0], 2),_mm256_extract_epi64(prime[0], 1),0x7e92ed659b4b3490);
+	cout << dec << counter(prime,size) << endl;
+	delete[] prime;
+
+	// cout << piece << endl;
+
+	// uint32_t start = 1;
 
 	//create a vector of threads
-	vector<thread> t;
+	// vector<thread> t;
 
-	//creat threads till the processor_count
-	//alice helped with the for loop that create the threads
-	for(int i = 0; i < processor_count; i++){
+	// //creat threads till the processor_count
+	// //alice helped with the for loop that create the threads
+	// for(int i = 0; i < processor_count; i++){
 
-		//make output file and attempts to increment it
-		// it doesn't work i getting ASCII value not numbers
-		// char c = i+48;
-		// cout << c << endl;
-		// file += c;
-		// file += ".csv";
-		// cout << file << endl;
+	// 	//make output file and attempts to increment it
+	// 	// it doesn't work i getting ASCII value not numbers
+	// 	// char c = i+48;
+	// 	// cout << c << endl;
+	// 	// file += c;
+	// 	// file += ".csv";
+	// 	// cout << file << endl;
 
-		//sets the ending position of the fuction
-		uint32_t end=piece+start;
+	// 	//sets the ending position of the fuction
+	// 	uint32_t end=piece+start;
 
-		//spawns a thread with the list generator
-		t.emplace_back(list_generator, start, end, prime);
+	// 	//spawns a thread with the list generator
+	// 	t.emplace_back(list_generator, start, end, prime);
 
-		//seth the start to the ole ned for the net iteration
-		start = end;
-	}
+	// 	//seth the start to the ole ned for the net iteration
+	// 	start = end;
+	// }
 
-	//Joins all the thread at the end
-	for(auto&& e: t){
-  	e.join();
-	}
-
-
-	constexpr uint64_t size2 = size*4;
-	uint64_t* prime2 = new uint64_t[size2];
+	// //Joins all the thread at the end
+	// for(auto&& e: t){
+  // 	e.join();
+	// }
 
 
-	for (uint64_t i = 0,j=0; i <= size; i++, j+=4){
+	// constexpr uint64_t size2 = size*4;
+	// uint64_t* prime2 = new uint64_t[size2];
+
+
+	// for (uint64_t i = 0,j=0; i <= size; i++, j+=4){
 	
-	// __m128i t128_0, t128_1;
-	//pulls the avx register apart and left shits stor the out put in a __m128i
-	// t128_0 =	_mm256_extracti128_si256(prime[i], 0);
-	// prime2[j] = _mm_extract_epi64(t128_0, 0);
-	// prime2[j+1] = _mm_extract_epi64(t128_0, 1);
-	// t128_1 =	_mm256_extracti128_si256(prime[i], 0);
-	// prime2[j+2] = _mm_extract_epi64(t128_1, 0);
-	// prime2[j+3] = _mm_extract_epi64(t128_1, 1);
+	// // __m128i t128_0, t128_1;
+	// //pulls the avx register apart and left shits stor the out put in a __m128i
+	// // t128_0 =	_mm256_extracti128_si256(prime[i], 0);
+	// // prime2[j] = _mm_extract_epi64(t128_0, 0);
+	// // prime2[j+1] = _mm_extract_epi64(t128_0, 1);
+	// // t128_1 =	_mm256_extracti128_si256(prime[i], 0);
+	// // prime2[j+2] = _mm_extract_epi64(t128_1, 0);
+	// // prime2[j+3] = _mm_extract_epi64(t128_1, 1);
 
-		prime2[j]=_mm256_extract_epi64(prime[i], 0);
-		prime2[j+1]=_mm256_extract_epi64(prime[i], 1);
-		prime2[j+2]=_mm256_extract_epi64(prime[i], 2);
-		prime2[j+3]=_mm256_extract_epi64(prime[i], 3);
+	// 	prime2[j]=_mm256_extract_epi64(prime[i], 0);
+	// 	prime2[j+1]=_mm256_extract_epi64(prime[i], 1);
+	// 	prime2[j+2]=_mm256_extract_epi64(prime[i], 2);
+	// 	prime2[j+3]=_mm256_extract_epi64(prime[i], 3);
 
-	}
+	// }
 	
-	EratosthenesSieve(n,prime2,size2);
+	// EratosthenesSieve(n,prime2,size2);
 
-	counter(prime2,size2);
+	// counter(prime2,size2);
 	
-	for (uint64_t i = 0; i < 16; i++){
-		cout << hex << prime2[i] << endl;
-	}
+	// for (uint64_t i = 0; i < 16; i++){
+	// 	cout << hex << prime2[i] << endl;
+	// }
 	
-	delete[] prime,prime2;
+	// delete[] prime,prime2;
 	return 0;
 }
 

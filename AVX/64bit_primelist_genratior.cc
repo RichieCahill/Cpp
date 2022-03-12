@@ -43,11 +43,9 @@ void list_generator(uint64_t s, uint64_t e, uint64_t* prime){
 	//loos form s to e making the temp register piking mask based on counter
 	for (uint32_t i = s; i < e+1; i++) {
 
-		uint64_t temp = 0;
-
 		// pattern 1 2 0
 		uint64_t tempmask = _mm_extract_epi64(mask5_3, 0);
-		temp |=  tempmask << ((5+(6-(i%3)))%3);
+		uint64_t temp =  tempmask << ((5+(6-(i%3)))%3);
 
 		// pattern 2 3 4 0 1
 		tempmask = _mm_extract_epi64(mask5_3, 1);
@@ -105,7 +103,7 @@ void EratosthenesSieve(uint64_t n ,uint64_t* prime,uint64_t size){
 
 int main() {
 	// The number you want to calculate to
-	constexpr uint64_t total = 10000000000;
+	constexpr uint64_t total = 100000256;
 	// calculates next multipule of 128 above total
 	constexpr uint64_t mult = (128-(total%128)+total);
 	// calculates the difference  between total nad mult
