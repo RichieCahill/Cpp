@@ -86,16 +86,11 @@ bool is_prime(uint64_t* prime, uint64_t pos){
 	return !(prime[pos>>7] & (1ULL<<((pos>>1)%64)));
 }
 
-// checks if bit at pos is 0
-void clear_prime(uint64_t* prime, uint64_t pos){
-	prime[pos>>7] |= (1ULL<<((pos>>1)%64));
-}
-
 void EratosthenesSieve(uint64_t n ,uint64_t* prime,uint64_t size){
 	for (uint64_t i = 3; i <= sqrt(n); i+=2){
 		if (is_prime(prime,i)){
 			for (uint64_t j = i*i; j <= n; j+=2*i)
-				clear_prime(prime,j);
+				prime[j>>7] |= (1ULL<<((j>>1)%64));
 		}
 	}
 }
@@ -113,18 +108,26 @@ int main() {
 	uint64_t* prime = new uint64_t[size];
 
 	clock_t t0 = clock();
+
 	list_generator(1,size,prime);
 
+	// clock_t t1 = clock();
+	// cout << "1 " << (t1-t0)* 1e-6  << '\n' << '\n';
+
+	// t0 = clock();
 
 	EratosthenesSieve(mult,prime,size);
 
-	clock_t t1 = clock();
-	cout << (t1-t0) * 1e-6 << '\n';
+	// t1 = clock();
+	// cout << "2 " << (t1-t0)* 1e-6  << '\n' << '\n';
 
 	// This is set the firs 64bit because list_generator dosnt properly calculate the firs bits for the number its masking
 	prime[0] = 0x7e92ed659b4b3490;
-
+	// t0 = clock();
 	cout << dec << counter(prime,size,extra) << endl;
+	// t1 = clock();
+	clock_t t1 = clock();
+	cout << "3 " << (t1-t0)* 1e-6  << '\n' << '\n';
 
 	delete[] prime;
 	return 0;

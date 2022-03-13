@@ -70,17 +70,17 @@ void list_generator(uint64_t s, uint64_t e, __m256i* prime){
 
 		// masks multiple of 3
 		//patern 1 0 2
-		temp = _mm256_lls_mm256(mask3,2-(i%3));
+		temp = _mm256_lls_mm256_helper(mask3,2-(i%3));
 		// temp = _mm256_or_si256(temp, _mm256_lls_mm256(mask3, (5-(i%3))%3));
 
 		// masks multiple of 5
 		//patern 2 1 0 4 3
-		temp = _mm256_or_si256(temp, _mm256_lls_mm256(mask5,(8-(i%5))%5));
+		temp = _mm256_or_si256(temp, _mm256_lls_mm256_helper(mask5,(8-(i%5))%5));
 
 		// masks multiple of 7
 		//patern 3 6 2 5 1 4 0
 		// cout << (11*i-(i%7))%7 << endl;
-		temp = _mm256_or_si256(temp, _mm256_lls_mm256(mask7,(11*i-(i%7))%7));
+		temp = _mm256_or_si256(temp, _mm256_lls_mm256_helper(mask7,(11*i-(i%7))%7));
 
 
 		// masks multiple of 11
@@ -104,10 +104,6 @@ bool is_prime( __m256i* prime, uint64_t pos){
 	return _mm256_testz_si256(prime[pos/512],(_mm256_lls_mm256(mask1,((pos/2)%256))));
 }
 
-void clear_prime(__m256i* prime, uint64_t pos){
-	prime[pos/512] = _mm256_or_si256(prime[pos/512],(_mm256_lls_mm256(mask1,((pos/2)%256))));
-}
-
 uint64_t counter(__m256i* prime, uint64_t size){
 	__m256i count = _mm256_setzero_si256(), temp;
 	for (uint64_t i = 0; i <= size-2; i++){
@@ -122,7 +118,7 @@ void EratosthenesSieve(uint64_t n ,__m256i* prime,uint64_t size){
 	for (uint64_t i = 3; i <= sqrt(n); i+=2){
 		if (is_prime(prime,i)){
 			for (uint64_t j = i*i; j <= n; j+=2*i)
-				clear_prime(prime,j);
+				prime[j/512] = _mm256_or_si256(prime[j/512],(_mm256_lls_mm256(mask1,((j>>1)%256))));
 		}
 	}
 }
@@ -146,13 +142,28 @@ int main() {
 	// constexpr uint64_t processor_count = 1;
 	//divides the work into processor_count of equal pieces
 	// const uint64_t piece = (processor_count-(size%processor_count)+size)/processor_count;
+	clock_t t0 = clock();
 
 	list_generator(1,size,prime);
 
+	// clock_t t1 = clock();
+	// cout << "1 " << (t1-t0)* 1e-6  << '\n' << '\n';
+
+	// t0 = clock();
+
 	EratosthenesSieve(mult,prime,size);
 
+	// t1 = clock();
+	// cout << "2 " << (t1-t0)* 1e-6  << '\n' << '\n';
+
+	
 	prime[0] = _mm256_set_epi64x(_mm256_extract_epi64(prime[0], 3),_mm256_extract_epi64(prime[0], 2),_mm256_extract_epi64(prime[0], 1),0x7e92ed659b4b3490);
+	// t0 = clock();
 	cout << dec << counter(prime,size) << endl;
+	// t1 = clock();
+	clock_t t1 = clock();
+	cout << "3 " << (t1-t0)* 1e-6  << '\n' << '\n';
+
 	delete[] prime;
 
 	// cout << piece << endl;
