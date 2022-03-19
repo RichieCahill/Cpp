@@ -1,5 +1,6 @@
 #include <iostream>
 #include <immintrin.h>
+#include <cassert>
 
 using namespace std;
 
@@ -33,7 +34,7 @@ clock_t t0 = clock();
 for (int32_t i = 0; i < fast/8; i++) {
 	temp=_mm256_set_epi32(list[i],list[i+1],list[i+2],list[i+3],list[i+4],list[i+5],list[i+6],list[i+7]);
 	temp2=temp2+temp;
-	
+
 }
 
 
@@ -49,24 +50,20 @@ for (int32_t i = fast; i < size; i++){
 clock_t t1 = clock();
 cout << temp3  << '\n' << '\n';
 
-cout << (t1-t0)*1e-6  << '\n' << '\n';
+cout << "1 " << (t1-t0)*1e-6  << '\n' << '\n';
 
 
-
-
-
-// testing somthing 
+// testing somthing
 temp= _mm256_setzero_si256(),temp2 = _mm256_setzero_si256();
 t0 = clock();
 for (int32_t i = 0; i < fast/8; i++) {
 	temp=_mm256_set_epi32(list[i],list[i+1],list[i+2],list[i+3],list[i+4],list[i+5],list[i+6],list[i+7]);
 	temp2=temp2+temp;
-	
+
 }
 
 
 temp2=_mm256_hadd_epi32(temp2,_mm256_setzero_si256());
-avxout(temp2);
 
 __m128i test = _mm_hadd_epi32(_mm256_extractf128_si256(temp2,1),_mm256_extractf128_si256(temp2,0));
 

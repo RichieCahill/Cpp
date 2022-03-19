@@ -19,18 +19,27 @@ TODO
 
 using namespace std;
 
+typedef uint64_t u64;
+typedef uint32_t u32;
+typedef uint16_t u16;
+typedef uint8_t u8;
+
+typedef int64_t i64;
+typedef int32_t i32;
+typedef int16_t i16;
+typedef int8_t i8;
 
 // build a mask where every kth bit is one starting from right
-uint64_t buildmask(uint32_t k) {
-	uint64_t t = 0;
-	const uint64_t mask1 =1ULL;
-	for (uint32_t i = 0; i < 644; i += k){
+u64 buildmask(u32 k) {
+	u64 t = 0;
+	const u64 mask1 =1ULL;
+	for (u32 i = 0; i < 644; i += k){
 		t |= (t<<k);
 	}
 	return t;
 }
 
-void list_generator(uint64_t s, uint64_t e, uint64_t* prime){
+void list_generator(u64 s, u64 e, u64* prime){
 
 	// 31 0x1000000040000001
 
@@ -41,11 +50,11 @@ void list_generator(uint64_t s, uint64_t e, uint64_t* prime){
 	const __m128i mask5_3 = _mm_set_epi64x(0x1084210842108421,0x9249249249249249);
 
 	//loos form s to e making the temp register piking mask based on counter
-	for (uint32_t i = s; i < e+1; i++) {
+	for (u32 i = s; i < e+1; i++) {
 
 		// pattern 1 2 0
-		uint64_t tempmask = _mm_extract_epi64(mask5_3, 0);
-		uint64_t temp =  tempmask << ((5+(6-(i%3)))%3);
+		u64 tempmask = _mm_extract_epi64(mask5_3, 0);
+		u64 temp =  tempmask << ((5+(6-(i%3)))%3);
 
 		// pattern 2 3 4 0 1
 		tempmask = _mm_extract_epi64(mask5_3, 1);
@@ -73,23 +82,23 @@ void list_generator(uint64_t s, uint64_t e, uint64_t* prime){
 }
 
 // counts the number prime numbers in the array minus the bits that are
-uint64_t counter(uint64_t *prime, uint64_t size, uint64_t extra){
-uint64_t  temp = 0;
-	for (uint64_t i = 0; i <= size-1; i++){
+u64 counter(u64 *prime, u64 size, u64 extra){
+u64  temp = 0;
+	for (u64 i = 0; i <= size-1; i++){
 		temp += (64-_mm_popcnt_u64(prime[i]));
 	}
 	return temp - (extra-_mm_popcnt_u64(prime[size-1]>>(64-extra)));
 }
 
 // checks if bit at pos is 0
-bool is_prime(uint64_t* prime, uint64_t pos){
+bool is_prime(u64* prime, u64 pos){
 	return !(prime[pos>>7] & (1ULL<<((pos>>1)%64)));
 }
 
-void EratosthenesSieve(uint64_t n ,uint64_t* prime,uint64_t size){
-	for (uint64_t i = 3; i <= sqrt(n); i+=2){
+void EratosthenesSieve(u64 n ,u64* prime,u64 size){
+	for (u64 i = 3; i <= sqrt(n); i+=2){
 		if (is_prime(prime,i)){
-			for (uint64_t j = i*i; j <= n; j+=2*i)
+			for (u64 j = i*i; j <= n; j+=2*i)
 				prime[j>>7] |= (1ULL<<((j>>1)%64));
 		}
 	}
@@ -98,14 +107,14 @@ void EratosthenesSieve(uint64_t n ,uint64_t* prime,uint64_t size){
 
 int main() {
 	// The number you want to calculate to
-	constexpr uint64_t total = 100000256;
+	constexpr u64 total = 100000256;
 	// calculates next multipule of 128 above total
-	constexpr uint64_t mult = (128-(total%128)+total);
+	constexpr u64 mult = (128-(total%128)+total);
 	// calculates the difference  between total nad mult
-	constexpr uint64_t extra = ((mult-total)>>1);
+	constexpr u64 extra = ((mult-total)>>1);
 	// create and list of 64bit ints 128 time smaller then mult
-	constexpr uint64_t size = mult>>7;
-	uint64_t* prime = new uint64_t[size];
+	constexpr u64 size = mult>>7;
+	u64* prime = new u64[size];
 
 	clock_t t0 = clock();
 
