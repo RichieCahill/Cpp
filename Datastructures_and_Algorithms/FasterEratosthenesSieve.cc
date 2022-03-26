@@ -50,7 +50,7 @@ void EratosthenesSieve(uint64_t n ,uint64_t* prime,uint64_t size){
 
 int main(int argc, char const *argv[]){
 	// The number you want to calculate to
-	constexpr uint64_t total = 1000;
+	constexpr uint64_t total = 10000000000;
 	// calculates next multipule of 128 above total
 	constexpr uint64_t mult = (128-(total%128)+total);
 	// calculates the difference  between total nad mult

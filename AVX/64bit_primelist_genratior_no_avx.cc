@@ -29,48 +29,30 @@ typedef int32_t i32;
 typedef int16_t i16;
 typedef int8_t i8;
 
-// build a mask where every kth bit is one starting from right
-u64 buildmask(u32 k) {
-	u64 t = 0;
-	const u64 mask1 =1ULL;
-	for (u32 i = 0; i < 644; i += k){
-		t |= (t<<k);
-	}
-	return t;
-}
-
 void list_generator(u64 s, u64 e, u64* prime){
-
 
 	//loos form s to e making the temp register piking mask based on counter
 	for (u32 i = s; i < e+1; i++) {
-		const	u64 mask17 = buildmask(17);
-		const	u64 mask13 = 0x0010008004002001;
-		const	u64 mask11 = 0x0080100200400801;
-		const	u64 mask7 = 0x8102040810204081;
-		const	u64 mask5 = 0x1084210842108421;
-		const	u64 mask3 = 0x9249249249249249;
-		
-		
-		
-		
-		
-		
-		// pattern 1 2 0
-		u64 temp = mask3 << ((5+(6-(i%3)))%3);
 
-		// pattern 2 3 4 0 1
-		temp |= mask5 << (1+(i%5))%5;
+		u64 temp = 0x9249249249249249 << (2+(3-(i%3)))%3;
 
-		// pattern 3 2 1 0 6 5 4
-		temp |= mask7 << (5+(6-(i%7)))%7;
-		
-		// pattern 4 6 8 10 1 3 5 7 9 0 2
-		temp |= mask11 << 2+((i%11)*2)%11;
+		temp |= 0x1084210842108421 << (1+((i%5)))%5;
 
-		// temp |= mask13 << (6+(i%13))%13;
+		temp |= 0x8102040810204081 << (5+(6-(i%7)))%7;
 
-		// temp |= mask17 << (6+(i%17))%17;
+		temp |= 0x0080100200400801 << (3+((i%11)*2))%11;
+
+		temp |= 0x0010008004002001 << (5+(i%13))%13;
+
+		temp |= 0x0008000400020001 << (4+((i%17)*4))%17;
+
+		temp |= 0x0200004000080001 << (18+((17+(18-(i%19)))*7))%19;
+
+		temp |= 0x0000400000800001 << (6+((i%23)*5))%23;
+
+		temp |= 0x0400000020000001 << (9+(27+(28-(i%29)))*6)%29;
+
+		temp |= 0x4000000080000001 << (23+(29+(30-(i%31)))*2)%31;
 
 		prime[i-1]=temp;
 
