@@ -29,51 +29,30 @@ typedef int32_t i32;
 typedef int16_t i16;
 typedef int8_t i8;
 
-
 void list_generator(u64 s, u64 e, u64* prime){
-
-	const __m128i maskFF_61 = _mm_set_epi64x(0xFFFFFFFFFFFFFFFF,0x2000000000000001);
-	const __m128i mask59_53 = _mm_set_epi64x(0x0800000000000001,0x0020000000000001);
-	const __m128i mask47_43 = _mm_set_epi64x(0x0000800000000001,0x0000080000000001);
-	const __m128i mask41_37 = _mm_set_epi64x(0x0000020000000001,0x0000002000000001);
-	const __m128i mask31_29 = _mm_set_epi64x(0x4000000080000001,0x0400000020000001);
-	const __m128i mask23_19 = _mm_set_epi64x(0x0000400000800001,0x0200004000080001);
-	const __m128i mask17_13 = _mm_set_epi64x(0x0008000400020001,0x0010008004002001);
-	const __m128i mask11_7 = _mm_set_epi64x(0x0080100200400801,0x8102040810204081);
-	const __m128i mask5_3 = _mm_set_epi64x(0x1084210842108421,0x9249249249249249);
 
 	//loos form s to e making the temp register piking mask based on counter
 	for (u32 i = s; i < e+1; i++) {
 
-		u64 tempmask = _mm_extract_epi64(mask5_3, 0);
-		u64 temp =  tempmask << (2+(3-(i%3)))%3;
+		u64 temp = 0x9249249249249249 << (2+(3-(i%3)))%3;
 
-		tempmask = _mm_extract_epi64(mask5_3, 1);
-		temp |= tempmask << (1+((i%5)))%5;
+		temp |= 0x1084210842108421 << (1+((i%5)))%5;
 
-		tempmask = _mm_extract_epi64(mask11_7, 0);
-		temp |=  tempmask << (5+(6-(i%7)))%7;
+		temp |= 0x8102040810204081 << (5+(6-(i%7)))%7;
 
-		tempmask = _mm_extract_epi64(mask11_7, 1);
-		temp |= tempmask << (3+((i%11)*2))%11;
+		temp |= 0x0080100200400801 << (3+((i%11)*2))%11;
 
-		tempmask = _mm_extract_epi64(mask17_13, 0);
-		temp |=  tempmask << (5+(i%13))%13;
+		temp |= 0x0010008004002001 << (5+(i%13))%13;
 
-		tempmask = _mm_extract_epi64(mask17_13, 1);
-		temp |=  tempmask << (4+((i%17)*4))%17;
+		temp |= 0x0008000400020001 << (4+((i%17)*4))%17;
 
-		tempmask = _mm_extract_epi64(mask23_19, 0);
-		temp |=  tempmask << (18+((17+(18-(i%19)))*7))%19;
+		temp |= 0x0200004000080001 << (18+((17+(18-(i%19)))*7))%19;
 
-		tempmask = _mm_extract_epi64(mask23_19, 1);
-		temp |=  tempmask << (6+((i%23)*5))%23;
+		temp |= 0x0000400000800001 << (6+((i%23)*5))%23;
 
-		tempmask = _mm_extract_epi64(mask31_29, 0);
-		temp |=  tempmask << (9+(27+(28-(i%29)))*6)%29;
+		temp |= 0x0400000020000001 << (9+(27+(28-(i%29)))*6)%29;
 
-		tempmask = _mm_extract_epi64(mask31_29, 1);
-		temp |=  tempmask << (23+(29+(30-(i%31)))*2)%31;
+		temp |= 0x4000000080000001 << (23+(29+(30-(i%31)))*2)%31;
 
 		prime[i-1]=temp;
 
@@ -104,10 +83,9 @@ void EratosthenesSieve(u64 n ,u64* prime,u64 size){
 	}
 }
 
-
 int main() {
 	// The number you want to calculate to
-	constexpr u64 total = 10000000000;
+	constexpr u64 total = 100000000000;
 	// calculates next multipule of 128 above total
 	constexpr u64 mult = (128-(total%128)+total);
 	// calculates the difference  between total nad mult
@@ -120,16 +98,23 @@ int main() {
 
 	list_generator(1,size,prime);
 
-	// This is set the firs 64bit because list_generator dosnt properly calculate the firs bits for the number its masking
- 	prime[0] = 0x7e92ed659b4b3490;
+	// clock_t t1 = clock();
+	// cout << "1 " << (t1-t0)* 1e-6  << '\n' << '\n';
+
+	// t0 = clock();
 
 	EratosthenesSieve(mult,prime,size);
 
+	// t1 = clock();
+	// cout << "2 " << (t1-t0)* 1e-6  << '\n' << '\n';
+
+	// This is set the firs 64bit because list_generator dosnt properly calculate the firs bits for the number its masking
+	prime[0] = 0x7e92ed659b4b3490;
+	// t0 = clock();
 	cout << dec << counter(prime,size,extra) << endl;
-
+	// t1 = clock();
 	clock_t t1 = clock();
-
-	cout << (t1-t0)* 1e-6  << '\n';
+	cout << (t1-t0)* 1e-6  << '\n' << '\n';
 
 	delete[] prime;
 	return 0;

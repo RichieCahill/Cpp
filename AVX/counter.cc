@@ -21,7 +21,7 @@ void clear_prime(u64* prime, u64 pos){
 
 int main(int argc, char const *argv[]){
 	// The number you want to calculate to
-	constexpr u64 total = 10000;
+	constexpr u64 total = 5000;
 	// calculates next multipule of 128 above total
 	constexpr u64 mult = (128-(total%128)+total);
 	// calculates the difference  between total nad mult
@@ -35,14 +35,14 @@ int main(int argc, char const *argv[]){
 		prime[i] = 0;
 	
 
-	u32 num = 67;
+	u32 num = 7;
 	for (u64 j = num; j <= mult; j+=2*num){
 		clear_prime(prime,j);
 	}
 	
 	for (u64 i = 0; i <= size-1; i++){
-		// cout << _tzcnt_u64(prime[i]) << " ";
-		cout << dec << i << " " << _tzcnt_u64(prime[i]) << " " << hex << prime[i] << endl;		
+		cout << _tzcnt_u64(prime[i]) << " ";
+		// cout << dec << i << " " << _tzcnt_u64(prime[i]) << " " << hex << prime[i] << endl;		
 	}
 
 	return 0;
