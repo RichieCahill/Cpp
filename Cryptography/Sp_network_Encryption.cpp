@@ -16,21 +16,12 @@ typedef int64_t i64;
 typedef int32_t i32;
 typedef int16_t i16;
 typedef int8_t i8;
-
+/*
+	5 gchdeabf
+	0 abcdefgh
+*/
 u32 P_box_1(u32 input){
-	/*
-		0 abcd efgh
-		1 efgh abcd
-		2 ghef cdab
-		3 ghcd efab
-		4 gchd eafb
-		5 gchd eabf
-	*/
-	input = (input & 0x00) | ((input & 0xF0)>>4) | ((input & 0xF)<<4); //1
-	input = (input & 0x00) | ((input & 0xcc)>>2) | ((input & 0x33)<<2);//2
-	input = (input & 0xc3) | ((input & 0x30)>>2) | ((input & 0xc)<<2);//3
-	input = (input & 0x99) | ((input & 0x44)>>1) | ((input & 0x22)<<1);//4
-	return  (input & 0xFC) | ((input & 0x2)>>1) | ((input & 0x1)<<1);//5
+	return  ((input & 0x80)>>5) | ((input & 0x40)>>5) | ((input & 0x20)<<1) | (input & 0x18) | ((input & 0x4)>>2) | ((input & 0x2)<<6) | ((input & 0x1)<<5);//5
 }
 
 u32 Round(u32 data){
