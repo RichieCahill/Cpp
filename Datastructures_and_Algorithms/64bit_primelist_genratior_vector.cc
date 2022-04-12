@@ -97,30 +97,30 @@ the first number in the pattern plus the number after zero mod the number you ar
 }
 
 // counts the number prime numbers in the array minus the bits that are
-u64 counter(vector<u64>& prime, u64 extra){
-u64  temp = 0;
-	for (u64 i = 0; i <= prime.size()-1; i++){
-		temp += (64-_mm_popcnt_u64(prime[i]));
+auto counter(vector<u64>& prime, auto extra){
+	auto temp = 0;
+	for (const auto& i : prime) {
+		temp += (64-_mm_popcnt_u64(i));
 	}
-	return temp - (extra-_mm_popcnt_u64(prime[prime.size()-1]>>(64-extra)));
+	return temp - (extra-_mm_popcnt_u64(prime.back()>>(64-extra)));
 }
 
 
 // checks if bit at pos is 0
 // return !(prime[pos/64] & (1ULL<<((pos/2)%64));
-bool is_prime(vector<u64>& prime, u64 pos){
+bool is_prime(vector<u64>& prime, auto pos){
 	return !(prime[pos>>7] & (1ULL<<(pos>>1)));
 }
 
-void clear_prime(vector<u64>& prime, uint64_t pos){
+void clear_prime(vector<u64>& prime, auto pos){
 	prime[pos>>7] |= (1ULL<<(pos>>1));
 }
 
-void EratosthenesSieve(u64 n ,vector<u64>& prime){
-	// for (u64 i = 59; i <= sqrt(n); i+=2){
-	for (u64 i = 3; i <= sqrt(n); i+=2){
+void EratosthenesSieve(auto n ,vector<u64>& prime){
+	// for (auto i = 59; i <= sqrt(n); i+=2){
+	for (auto i = 3; i <= sqrt(n); i+=2){
 		if (is_prime(prime,i)){
-			for (u64 j = i*i; j <= n; j+=2*i)
+			for (auto j = i*i; j <= n; j+=2*i)
 				clear_prime(prime,j);
 		}
 	}
@@ -129,14 +129,13 @@ void EratosthenesSieve(u64 n ,vector<u64>& prime){
 
 int main() {
 	// The number you want to calculate to
-	// constexpr u64 total = 10000000000;
-	constexpr u64 total = 10000000000;
+	constexpr auto total = 10000000000;
 	// calculates next multipule of 128 above total
-	constexpr u64 mult = (128-(total%128)+total);
+	constexpr auto mult = (128-(total%128)+total);
 	// calculates the difference  between total nad mult
-	constexpr u64 extra = ((mult-total)>>1);
+	constexpr auto extra = ((mult-total)>>1);
 	// create and list of 64bit ints 128 time smaller then mult
-	constexpr u64 size = mult>>7;
+	constexpr auto size = mult>>7;
 	vector<u64> prime(size);
 
 	clock_t t2 = clock();
