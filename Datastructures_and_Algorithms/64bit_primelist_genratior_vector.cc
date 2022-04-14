@@ -129,7 +129,7 @@ void EratosthenesSieve(auto n ,vector<u64>& prime){
 
 int main() {
 	// The number you want to calculate to
-	constexpr auto total = 10000000000;
+	constexpr auto total = 4096;
 	// calculates next multipule of 128 above total
 	constexpr auto mult = (128-(total%128)+total);
 	// calculates the difference  between total nad mult
@@ -139,31 +139,31 @@ int main() {
 	vector<u64> prime(size);
 
 	clock_t t2 = clock();
-	clock_t t0 = clock();
+	// clock_t t0 = clock();
 
 	list_generator(prime);
 
-	clock_t t1 = clock();
-	cout << "1 " << (t1-t0)* 1e-6  << '\n' << '\n';
+	// clock_t t1 = clock();
+	// cout << "1 " << (t1-t0)* 1e-6  << '\n' << '\n';
 
-	t0 = clock();
+	// t0 = clock();
 
 	EratosthenesSieve(mult,prime);
 
-	t1 = clock();
-	cout << "2 " << (t1-t0)* 1e-6  << '\n' << '\n';
+	// t1 = clock();
+	// cout << "2 " << (t1-t0)* 1e-6  << '\n' << '\n';
 
 	// This is set the firs 64bit because list_generator dosnt properly calculate the firs bits for the number its masking
 	prime[0] = 0x7e92ed659b4b3490;
-	t0 = clock();
+	// t0 = clock();
 	cout << dec << counter(prime,extra) << endl;
 
-	t1 = clock();
+	// t1 = clock();
 
-	// clock_t t1 = clock();
-	cout << (t1-t0)* 1e-6  << '\n' << '\n';
+	clock_t t1 = clock();
+	// cout << (t1-t0)* 1e-6  << '\n' << '\n';
 	clock_t t3 = clock();
-	cout << (t2-t3)* 1e-6  << '\n' << '\n';
+	cout << (t3-t2)* 1e-6  << '\n' << '\n';
 
 	return 0;
 }

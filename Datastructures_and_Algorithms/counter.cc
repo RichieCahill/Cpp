@@ -15,34 +15,24 @@ typedef int32_t i32;
 typedef int16_t i16;
 typedef int8_t i8;
 
-void clear_prime(u64* prime, u64 pos){
+void clear_prime(vector<u64>& prime, u64 pos){
 	prime[pos>>7] |= (1ULL<< ((pos>>1)%64));
 }
 
 int main(int argc, char const *argv[]){
+	// This is number you want to caculate the pater for
+	constexpr u64 num =  	71;
 	// The number you want to calculate to
-	constexpr u64 total = 10000;
-	// calculates next multipule of 128 above total
-	constexpr u64 mult = (128-(total%128)+total);
-	// calculates the difference  between total nad mult
-	constexpr u64 extra = ((mult-total)>>1);
-	// create and list of 64bit ints 128 time smaller then mult
-	constexpr u64 size = mult>>7;
-	u64* prime = new u64[size];
-	
+	constexpr u64 size = num+1;
+	vector<u64> prime(size,0);
 
-	for (u64 i = 0; i <= size-1; i++)
-		prime[i] = 0;
-	
-
-	u32 num = 61;
-	for (u64 j = num; j <= mult; j+=2*num){
-		clear_prime(prime,j);
+	for (u64 i = num; i <= size*128; i+=2*num){
+		clear_prime(prime,i);
 	}
-	
+
 	for (u64 i = 0; i <= size-1; i++){
 		cout << _tzcnt_u64(prime[i]) << " ";
-		// cout << dec << i << " " << _tzcnt_u64(prime[i]) << " " << hex << prime[i] << endl;		
+		// cout << dec << i << " " << _tzcnt_u64(prime[i]) << " " << hex << prime[i] << endl;
 	}
 
 	return 0;
