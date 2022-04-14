@@ -16,6 +16,10 @@ typedef int32_t i32;
 typedef int16_t i16;
 typedef int8_t i8;
 
+// (num-1)/2 converted to num right shift 1 by Alice Huston
+u64 Maskshift(u64 mask,u64 num,u64 i){
+		 return mask << ((num>>1)+2*i)%num;
+}
 
 int main(int argc, char const *argv[]){
 u64 num=0;
