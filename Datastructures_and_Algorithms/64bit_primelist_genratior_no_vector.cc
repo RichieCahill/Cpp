@@ -17,8 +17,8 @@ typedef int16_t i16;
 typedef int8_t i8;
 
 // (num-1)/2 converted to num right shift 1 by Alice Huston
-u64 Maskshift(u64 mask,u64 num,u64 i){
-		 return mask << ((num>>1)+2*i)%num;
+u64 Maskshift(u64 mask,u64 num,u64 i,u64 s){
+	return mask << ((num>>1)+(3-(num>>1)*s)%num*i)%num;
 }
 
 int main(int argc, char const *argv[]){
@@ -30,7 +30,8 @@ u64 num=0;
 	for (size_t i = 0; i <= 31; i++){
 	
 		// pattern 1 0 2
-		u64 temp = 0x9249249249249249 << (1+2*i)%3;
+		// u64 temp = 0x9249249249249249 << (1+2*i)%3;
+		u64 temp = Maskshift(0x9249249249249249,3,i,1);
 
 		// pattern 2 3 4 0 1
 		temp |= 0x1084210842108421 << (2+i)%5;
