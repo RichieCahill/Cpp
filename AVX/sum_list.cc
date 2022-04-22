@@ -1,8 +1,27 @@
 #include <iostream>
 #include <immintrin.h>
-#include <cassert>
+#include <vector>
+#include <cmath>
+#include <cstdint>
+#include <map>
+#include <numeric>
+#include <ranges>
+#include <string>
+#include <variant>
+
 
 using namespace std;
+
+typedef uint64_t u64;
+typedef uint32_t u32;
+typedef uint16_t u16;
+typedef uint8_t u8;
+
+typedef int64_t i64;
+typedef int32_t i32;
+typedef int16_t i16;
+typedef int8_t i8;
+
 
 void avxout(__m256i a){
 	std::cout << _mm256_extract_epi32(a, 7) << "\n";
@@ -15,6 +34,19 @@ void avxout(__m256i a){
 	std::cout << _mm256_extract_epi32(a, 0) << "\n";
 	std::cout << "\n";
 }
+
+auto sum(vector<u64>& data){
+	return  std::accumulate(begin(data), end(data), 0.0);
+}
+
+auto sumloop(vector<u64>& data){
+	auto temp = 0;
+	for (size_t i = 0; i <= data.size(); i++){
+		temp += data[i];
+	}
+	return  temp;
+}
+
 
 int main(int argc, char const *argv[]){
 constexpr int32_t size = 2000000001;

@@ -16,6 +16,16 @@ g++ -lgmpxx -lgmp math.cc
 
 using namespace std;
 
+typedef uint64_t u64;
+typedef uint32_t u32;
+typedef uint16_t u16;
+typedef uint8_t u8;
+
+typedef int64_t i64;
+typedef int32_t i32;
+typedef int16_t i16;
+typedef int8_t i8;
+
 
 //Complexity O(log n)
 mpz_class gcd(mpz_class m, mpz_class n){
@@ -58,12 +68,12 @@ Complexity O(n)
 but can be Ω(1) if the factor was previously calculated
 This is memory expensive
 */
-mpz_class memofact(uint64_t n){
+mpz_class memofact(u64 n){
 	static vector<mpz_class> factmemo{1,1,2,6,24,120,720,5040,40320,362880,3628800,39916800,479001600,6227020800,87178291200,1307674368000,20922789888000,355687428096000,6402373705728000,121645100408832000,2432902008176640000};
 	mpz_class temp = 1;
 	if (n < factmemo.size())
 		return factmemo[n];
-	for (uint64_t i = factmemo.size(); i <= n; i++) {
+	for (u64 i = factmemo.size(); i <= n; i++) {
 		if (factmemo.size() == factmemo.capacity())
 			factmemo.reserve(factmemo.size()*1.50);
 			factmemo.push_back(factmemo[i-1] * i);

@@ -1,5 +1,7 @@
+.vscode
 Test
 test.*
+test2.*
 *.out
 my_asm_output.s
 AVX-bit-manipulation.h

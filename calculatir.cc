@@ -3,10 +3,21 @@
 
 using namespace std;
 
-int64_t main() {
-    int64_t a = 0;
-    int64_t b = 0;
-    int64_t d = 0;
+typedef uint64_t u64;
+typedef uint32_t u32;
+typedef uint16_t u16;
+typedef uint8_t u8;
+
+typedef int64_t i64;
+typedef int32_t i32;
+typedef int16_t i16;
+typedef int8_t i8;
+
+
+int main() {
+    i64 a = 0;
+    i64 b = 0;
+    i64 d = 0;
     cout << "num 1/n";
     cin >> a;
     cout << "num 2/n";

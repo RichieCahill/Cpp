@@ -6,14 +6,24 @@
 
 using namespace std;
 
-void modulo(int64_t in, int64_t num, string word, string& output) {
+typedef uint64_t u64;
+typedef uint32_t u32;
+typedef uint16_t u16;
+typedef uint8_t u8;
+
+typedef int64_t i64;
+typedef int32_t i32;
+typedef int16_t i16;
+typedef int8_t i8;
+
+void modulo(i64 in, i64 num, string word, string& output) {
   if (in % num == 0) {
     output += word;
   }
 }
 
 void fizzbuzz() {
-  for (int64_t i = 1; i <= INT32_MAX; i++){
+  for (i64 i = 1; i <= INT32_MAX; i++){
     char num[19];
     string output;
     

@@ -11,6 +11,17 @@
 #include<string>
 
 using namespace std;
+
+typedef uint64_t u64;
+typedef uint32_t u32;
+typedef uint16_t u16;
+typedef uint8_t u8;
+
+typedef int64_t i64;
+typedef int32_t i32;
+typedef int16_t i16;
+typedef int8_t i8;
+
 //choose(n,r) = n!/(r! (n-r)!) = 52! / (6! 46!)
 
 const string factfile = "facttable.txt";
@@ -51,10 +62,10 @@ void Writer(){
 factoreal calculation function
 this function is O(n) if the data is not in the array but it is Ω(1) if its present
 */
-double fact(int32_t n) {
+double fact(i32 n) {
 	if (n < factmemo.size())
 		return factmemo[n];
-	for (uint32_t i = factmemo.size(); i <= n; i++) {
+	for (u32 i = factmemo.size(); i <= n; i++) {
 	if (factmemo.size() == factmemo.capacity())
 		factmemo.reserve(factmemo.size()*1.50);
 		factmemo.push_back(factmemo[i-1] * i);
@@ -67,7 +78,7 @@ choose calculation
 this function is O(n) because the factor is memoization 
 but can be Ω(1) if the factor was previously calculated
 */
-double choose(int n, int r) {
+double choose(u32 n, u32 r) {
 	static double memo[100][100] = {0};
 
 	if (memo[n][r] != 0)
