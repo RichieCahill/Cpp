@@ -59,7 +59,7 @@ void EratosthenesSieve(auto n ,vector<u64>& prime){
 
 int main(int argc, char const *argv[]){
 	// The number you want to calculate to
-	constexpr auto total = 1000;
+	constexpr auto total = 4992;
 	// calculates next multipule of 128 above total
 	constexpr auto mult = (128-(total%128)+total);
 	// calculates the difference  between total nad mult
