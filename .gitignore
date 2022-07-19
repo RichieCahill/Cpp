@@ -6,3 +6,4 @@ test2.*
 my_asm_output.s
 AVX-bit-manipulation.h
 mandelbrot.cc
+DATA
