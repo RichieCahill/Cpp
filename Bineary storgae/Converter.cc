@@ -4,6 +4,8 @@
 #include <string>
 #include <cmath>
 #include <fstream>
+#include <regex>
+#include <memory.h>
 
 using namespace std;
 
@@ -81,32 +83,39 @@ float lat,lon,FIPS;
 u32 confirmed,deaths,peoplehospitalized,hospitalizationrate;
 double incidentrate,totaltestresults,casefatalityratio,UID,testingrate;
 
-sscanf(test.c_str(),"%[^,],%[^,],%[^,],%f,%f,%u,%u,%[^,],%[^,],%f,%lf,%lf,%u,%lf,%lf,%u,%lf,%u",statename,countrycode,date,&lat,&lon,&confirmed,&deaths,recovered,active,&FIPS,&incidentrate,&totaltestresults,&peoplehospitalized,&casefatalityratio,&UID,ISO,&testingrate,&hospitalizationrate);
-covidreport r={confirmed,deaths,u32(totaltestresults),float(incidentrate),float(casefatalityratio),float(testingrate)};
-	while (getline(csv, Line)){
-		sscanf(Line.c_str(),"%[^,],%[^,],%[^,],%f,%f,%u,%u,%[^,],%[^,],%f,%lf,%lf,%u,%lf,%lf,%u,%lf,%u",statename,countrycode,date,&lat,&lon,&confirmed,&deaths,recovered,active,&FIPS,&incidentrate,&totaltestresults,&peoplehospitalized,&casefatalityratio,&UID,ISO,&testingrate,&hospitalizationrate);
+char line[2048];
+char state[64];
 
-		covidreport r={confirmed,deaths,u32(totaltestresults),float(incidentrate),float(casefatalityratio),float(testingrate)};
+regex r ("[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,([^,]*),([^,]*),([^,]*)");
+cmatch m;
 
-		out.write(reinterpret_cast<const char *>(&r), sizeof(r));
+// smatch m;
 
-		#if 0
-		DeleteMulti(Line, 5);
-		iCutMulti(Line, out, 2);
-		DeleteMulti(Line, 2);
-		iCutStart(Line, out);
-		dCutStart(Line, out);
-		iCutStart(Line, out);
-		DeleteStart(Line);
-		dCutStart(Line, out);
-		iCutStart(Line, out);
-		DeleteStart(Line);
-		dCutStart(Line, out);
-		#endif
+	while (csv.getline(line,sizeof(line))){
+		if (regex_search(line,m,r)){
+			memcpy(state,line+m.position(1),m.length(1));
+			state[m.length(1)]='\0';
+			cout << m[1] << endl;
+			cout << m[2] << endl;
+			cout << m[3] << endl;
+			// string state = m[1];
+		}
+
+		// covidreport r={confirmed,deaths,u32(totaltestresults),float(incidentrate),float(casefatalityratio),float(testingrate)};
+
+		// out.write(reinterpret_cast<const char *>(&r), sizeof(r));
+
 	}
+
+	// i32 i32 i32 double i32 double i32 double
+	
+	out.close();
+
+	return 0;
+}
+
 	#if 0
 	while (getline(csv, Line)){
-		sscanf(Line.c_str());
 		DeleteMulti(Line, 5);
 		iCutMulti(Line, out, 2);
 		DeleteMulti(Line, 2);
@@ -119,10 +128,3 @@ covidreport r={confirmed,deaths,u32(totaltestresults),float(incidentrate),float(
 		DeleteStart(Line);
 		dCutStart(Line, out);
 	#endif
-	
-	// i32 i32 i32 double i32 double i32 double
-	
-	out.close();
-
-	return 0;
-}
